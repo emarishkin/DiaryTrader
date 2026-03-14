@@ -20,7 +20,7 @@ export interface Trade {
 }
 
 export interface Strategy {
-    id:number
+    id:string
     name:string
     description:string
     rules:string
