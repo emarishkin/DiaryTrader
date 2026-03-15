@@ -1,7 +1,9 @@
 import { use, useState } from "react"
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native"
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
-import { todayString } from "../utils/tradeUtils"
+import { calculateRiskReward, generateId, todayString } from "../utils/tradeUtils"
+import { Trade } from "../types"
+import { StorageService } from "../storage/storage"
 
 const AddTradeScreen = () => {
 
@@ -9,14 +11,78 @@ const AddTradeScreen = () => {
     const [direction,setDirection] = useState<'long' | 'short'>('long')
     const [symbol,setSymbol] = useState('')
     const [quantity,setQuantity] = useState('')
-    const [entryDate,setEnrtyDate] = useState(todayString())
+    const [entryDate,setEntryDate] = useState(todayString())
     const [entryPrice,setEntryPrice] = useState('')
     const [currency,setCurrency] = useState('RUB')
+    const [stopLoss,setStopLoss] = useState('')
+    const [takeProfit,setTakeProfit] = useState('')
+    const [exitDate,setExitDate] = useState('')
+    const [exitPrice,setExitPrice] = useState('')
+    const [notes,setNotes] = useState('')
+    
+    const ep = parseFloat(entryPrice)
+    const sl = parseFloat(stopLoss)
+    const tp = parseFloat(takeProfit)
+
+    const rrDisplay = !isNaN(ep) && !isNaN(sl) && !isNaN(tp) ? calculateRiskReward(ep,sl,tp,direction) : '—'
 
     const cycleCurrency = () => {
         const list = ['RUB','USD','EUR','USDT']
         const next = list[(list.indexOf(currency)+1)%list.length]
         setCurrency(next)
+    }
+
+    const clearForm = () => {
+        setMarket('spot');
+        setDirection('long');
+        setSymbol('');
+        setQuantity('');
+        setEntryDate(todayString());
+        setEntryPrice('');
+        setStopLoss('');
+        setTakeProfit('');
+        setCurrency('RUB');
+        setExitDate('');
+        setExitPrice('');
+        setNotes('');
+    }
+
+    async function handleSave(){
+
+        if(!symbol.trim()) return Alert.alert('Ошибка', 'Введите символ')
+        if(!entryPrice) return Alert.alert('Ошибка', 'Введите цену входа')
+        if(!quantity) return Alert.alert('Ошибка', 'Введите количество')
+
+        const hasExit = exitPrice && !isNaN(parseFloat(exitPrice))
+
+        const trade:Trade = {
+            id:generateId(),
+            market,
+            direction,
+            symbol:symbol.trim().toUpperCase(),
+            quantity:parseFloat(quantity),
+            entryDate,
+            entryPrice:parseFloat(entryPrice),
+            stopLoss:stopLoss ? parseFloat(stopLoss) : undefined,
+            takeProfit:takeProfit ? parseFloat(takeProfit) : undefined,
+            currency,
+            exitDate:exitDate || undefined,
+            exitPrice:hasExit ? parseFloat(exitPrice) : undefined,
+            notes:notes || undefined,
+            status:hasExit ? 'close' : 'open',
+            createdAt: new Date().toISOString()
+        }
+
+        if(hasExit) {
+            const qty = trade.quantity
+            trade.profit = trade.direction === 'long' ? (trade.exitPrice! - trade.entryPrice) * qty : (trade.entryPrice  - trade.exitPrice!) * qty
+        }
+
+        await StorageService.saveTrade(trade)
+        Alert.alert('✅ Сохранено', `Сделка ${trade.symbol} сохранена`, [
+        { text: 'OK', onPress: clearForm },
+        ])
+
     }
 
     return(
@@ -51,7 +117,7 @@ const AddTradeScreen = () => {
 
                     <View style={styles.row2}>
                         <View style={{flex:1}}>
-                            <Text style={styles.groupLabel}>Символ</Text>
+                            <Text style={styles.fieldLabel}>Символ</Text>
                             <TextInput
                                 style={styles.input}
                                 value={symbol}
@@ -61,14 +127,14 @@ const AddTradeScreen = () => {
                             />
                         </View>
                         <View style={styles.currencyBox}>
-                            <Text style={styles.groupLabel}>Валюта</Text>
+                            <Text style={styles.fieldLabel}>Валюта</Text>
                             <TouchableOpacity style={styles.currencyPill} onPress={cycleCurrency}>
                                 <Text style={styles.currencyText}>{currency}</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
 
-                    <Text style={styles.groupLabel}>Количество</Text>
+                    <Text style={styles.fieldLabel}>Количество</Text>
                     <TextInput
                         style={styles.input}
                         value={quantity}
@@ -80,17 +146,17 @@ const AddTradeScreen = () => {
 
                     <View style={styles.row2}>
                         <View style={{flex:1}}>
-                            <Text style={styles.groupLabel}>Дата входа:</Text>
+                            <Text style={styles.fieldLabel}>Дата входа:</Text>
                             <TextInput
                                 style={styles.input}
                                 value={entryDate}
-                                onChangeText={setEnrtyDate}
+                                onChangeText={setEntryDate}
                                 placeholder="DD.MM.YYYY"
                                 placeholderTextColor='#BDBDBD'
                             />
                         </View>
                         <View style={{flex:1}}>
-                            <Text style={styles.groupLabel}>Цена входа:</Text>
+                            <Text style={styles.fieldLabel}>Цена входа:</Text>
                             <TextInput
                                 style={styles.input}
                                 value={entryPrice}
@@ -102,7 +168,83 @@ const AddTradeScreen = () => {
                         </View>
                     </View>
 
-                    <View style={{height:100}} />
+                    <View style={styles.row2}>
+                        <View style={{flex:1}}>
+                            <Text style={styles.fieldLabel}>Стоп-лосс</Text>
+                            <TextInput 
+                                style={styles.input}
+                                value={stopLoss}
+                                onChangeText={setStopLoss}
+                                placeholder="0.00"
+                                placeholderTextColor="#BDBDBD"
+                                keyboardType="decimal-pad"
+                            />
+                        </View>
+
+                        <View style={{flex:1}}>
+                            <Text style={styles.fieldLabel}>Тейк-профит</Text>
+                            <TextInput 
+                                style={styles.input}
+                                value={takeProfit}
+                                onChangeText={setTakeProfit}
+                                placeholder="0.00"
+                                placeholderTextColor="#BDBDBD"
+                                keyboardType="decimal-pad"
+                            />
+                        </View>
+                    </View>
+
+                    <View style={styles.rrRow}>
+                        <Text style={styles.rrLabel}>Соотношение риск/прибыль:</Text>
+                        <Text style={[styles.rrValue, rrDisplay !== '—' && styles.rrAccent ]}>{rrDisplay}</Text>
+                    </View>
+
+                    <Text style={styles.sectionDivider}>Закрытие сделки (опционально)</Text>
+                    <View style={styles.row2}>
+                        <View style={{flex:1}}>
+                            <Text style={styles.fieldLabel}>Дата выхода:</Text>
+                            <TextInput 
+                                style={styles.input}
+                                value={exitDate}
+                                onChangeText={setExitDate}
+                                placeholder="DD.MM.YYYY"
+                                placeholderTextColor="#BDBDBD"
+                            />
+                        </View>
+
+                        <View style={{flex:1}}>
+                            <Text style={styles.fieldLabel}>Цена выхода:</Text>
+                            <TextInput 
+                                style={styles.input}
+                                value={exitPrice}
+                                onChangeText={setExitPrice}
+                                placeholder="0.00"
+                                placeholderTextColor="#BDBDBD"
+                                keyboardType="decimal-pad"
+                            />
+                        </View>
+                    </View>
+
+                    <Text style={styles.fieldLabel}>Заметки</Text>  
+                    <TextInput 
+                        style={[styles.input, styles.inputMultiline]}
+                        value={notes}
+                        onChangeText={setNotes}
+                        placeholder="Ваши наблюдения..."
+                        placeholderTextColor="#BDBDBD"
+                        multiline
+                    />
+
+                    <View style={styles.btnRow}>
+                        <TouchableOpacity style={styles.clearBtn} onPress={()=>{clearForm()}}>
+                            <Text style={styles.clearBtnText}>Очистить</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.saveBtn} onPress={()=>{handleSave()}}>
+                            <Text style={styles.saveBtnText}>Сохранить сделку</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    <View style={{height:80}} />
                 </ScrollView>
             </KeyboardAvoidingView>
         </SafeAreaView>
@@ -131,6 +273,13 @@ const styles = StyleSheet.create({
         color:'#757575',
         marginBottom:8,
         textTransform:'uppercase'
+    },
+    fieldLabel: { 
+        fontSize: 12, 
+        fontWeight: '600', 
+        color: '#757575', 
+        marginBottom: 5, 
+        textTransform: 'uppercase' 
     },
     toggleRow:{
         flexDirection:'row',
@@ -197,6 +346,68 @@ const styles = StyleSheet.create({
         fontSize: 15, 
         fontWeight: '600', 
         color: '#1A1A1A' 
+    },
+    rrRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#F0F4FF',
+        borderRadius: 10,
+        paddingHorizontal: 14,
+        paddingVertical: 10,
+        marginBottom: 12,
+    },
+    rrLabel: { 
+        fontSize: 13, 
+        color: '#546E7A', 
+        flex: 1 
+    },
+    rrValue: { 
+        fontSize: 15, 
+        fontWeight: '700', 
+        color: '#9E9E9E' 
+    },
+    rrAccent: { 
+        color: '#1E88E5' 
+    },
+    sectionDivider: {
+        fontSize: 12, fontWeight: '600', color: '#9E9E9E',
+        textTransform: 'uppercase', marginVertical: 12,
+        borderTopWidth: 1, borderTopColor: '#EEEEEE', paddingTop: 14,
+    },
+    inputMultiline: { 
+        height: 80, 
+        textAlignVertical: 'top' 
+    },
+    btnRow: { 
+        flexDirection: 'row', 
+        gap: 12, 
+        marginTop: 8 
+    },
+    clearBtn: {
+        flex: 1, 
+        backgroundColor: '#FFEBEE', 
+        borderRadius: 12,
+        paddingVertical: 15, 
+        alignItems: 'center',
+        borderWidth: 1, 
+        borderColor: '#FFCDD2',
+    },
+    clearBtnText: { 
+        color: '#C62828', 
+        fontSize: 15, 
+        fontWeight: '700' 
+    },
+    saveBtn: { 
+        flex: 2, 
+        backgroundColor: '#2E7D32', 
+        borderRadius: 12, 
+        paddingVertical: 15, 
+        alignItems: 'center' 
+    },
+    saveBtnText: { 
+        color: '#FFF', 
+        fontSize: 15, 
+        fontWeight: '700' 
     },
 })
 

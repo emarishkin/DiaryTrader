@@ -3,14 +3,14 @@ export interface Trade {
     market:'spot'|'futures'
     direction:'long'|'short'
     symbol:string
-    quantuty:number
+    quantity:number
     contractSize?:number
-    entryDate:number
+    entryDate:string       
     entryPrice:number
     stopLoss?:number
     takeProfit?:number
     currency:string
-    exitDate?:number
+    exitDate?:string
     exitPrice?:number
     setupName?:string
     notes?:string
