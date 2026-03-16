@@ -6,7 +6,7 @@ export const generateId = ():string => {
 
 export const calculateProfit = (trade:Trade):number => {
     if(!trade.exitPrice) return 0 
-    const qty = trade.quantuty * (trade.contractSize ?? 0)
+    const qty = trade.quantity * (trade.contractSize ?? 0)
     return trade.direction === 'long'
     ? (trade.exitPrice - trade.entryPrice) * qty
     : (trade.entryPrice - trade.exitPrice) * qty
