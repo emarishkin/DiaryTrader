@@ -6,9 +6,12 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Trade } from '../types';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { StorageService } from '../storage/storage';
 import { formatMoney } from '../utils/tradeUtils';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { TradeHistoryScreen } from './TradeHistoryScreen';
+
 
 const DashboardScreen = () => {
  
@@ -19,6 +22,8 @@ const DashboardScreen = () => {
     useFocusEffect(useCallback(()=>{
       StorageService.getTrades().then(setTrades)
     }, []))
+
+    const navigation = useNavigation()
 
     const onRefresh = async () => {
       setRefreshing(true)
@@ -112,7 +117,7 @@ const DashboardScreen = () => {
                     ))
                 )}
 
-                <TouchableOpacity style={styles.historyBtn} activeOpacity={0.8}>
+                <TouchableOpacity style={styles.historyBtn} activeOpacity={0.8} >
                     <Text style={styles.historyBtnLeft}>📋  История сделок</Text>
                     <Text style={styles.historyBtnRight}>{trades.length} сделок  →</Text>
                 </TouchableOpacity>
