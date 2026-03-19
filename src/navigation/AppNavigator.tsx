@@ -4,8 +4,11 @@ import { Image, StyleSheet, Text, View } from "react-native";
 import DashboardScreen from '../screens/DashboardScreen'
 import AddTradeScreen  from "../screens/AddTradeScreen";
 import StatisticsScreen from "../screens/StatisticsScreen";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import TradeHistoryScreen from "../screens/TradeHistoryScreen";
 
 const Tab = createBottomTabNavigator()
+const Stack = createNativeStackNavigator()
 
 const icons = {
   dashboard: require('../../assets/HouseDashboardScreenLogo.png'),
@@ -36,6 +39,15 @@ function TabIcon({source,focused,isAdd}:{source:any,focused:boolean,isAdd?:boole
     )
 }
 
+const DashboardStack = () => {
+    return (
+        <Stack.Navigator screenOptions={{headerShown:false}}>
+            <Stack.Screen name="DashboardHome" component={DashboardScreen} />
+            <Stack.Screen name="TradeHistory" component={TradeHistoryScreen} />
+        </Stack.Navigator>
+    )
+}
+
 export const AppNavigator = () => {
     return(
         <Tab.Navigator
@@ -47,7 +59,7 @@ export const AppNavigator = () => {
         >
             <Tab.Screen
                 name="Dashboard"
-                component={DashboardScreen}
+                component={DashboardStack}
                 options={{
                     tabBarIcon:({focused}) => (
                         <TabIcon source={icons.dashboard} focused={focused} />  

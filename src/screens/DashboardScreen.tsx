@@ -10,7 +10,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { StorageService } from '../storage/storage';
 import { formatMoney } from '../utils/tradeUtils';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { TradeHistoryScreen } from './TradeHistoryScreen';
+import TradeHistoryScreen from "../screens/TradeHistoryScreen";
 
 
 const DashboardScreen = () => {
@@ -23,7 +23,7 @@ const DashboardScreen = () => {
       StorageService.getTrades().then(setTrades)
     }, []))
 
-    const navigation = useNavigation()
+   const navigation = useNavigation();
 
     const onRefresh = async () => {
       setRefreshing(true)
@@ -117,7 +117,7 @@ const DashboardScreen = () => {
                     ))
                 )}
 
-                <TouchableOpacity style={styles.historyBtn} activeOpacity={0.8} >
+                <TouchableOpacity style={styles.historyBtn} activeOpacity={0.8} onPress={() => (navigation as any).navigate('TradeHistory')}>
                     <Text style={styles.historyBtnLeft}>📋  История сделок</Text>
                     <Text style={styles.historyBtnRight}>{trades.length} сделок  →</Text>
                 </TouchableOpacity>

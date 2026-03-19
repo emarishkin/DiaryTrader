@@ -1,125 +1,140 @@
-import { useCallback, useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Trade } from "../types";
-import { useFocusEffect } from "@react-navigation/native";
-import { StorageService } from "../storage/storage";
-import { FlatList, TextInput } from "react-native-gesture-handler";
-import { formatMoney } from "../utils/tradeUtils";
+import React, { useState, useCallback } from 'react';
+import {
+  View, Text, StyleSheet, FlatList,
+  TextInput, TouchableOpacity, SafeAreaView,
+} from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import { Trade } from '../types';
+import { StorageService } from '../storage/storage';
+import { formatMoney } from '../utils/tradeUtils';
 
-type Filter = 'all' |'open' | 'closed' | 'long' | 'short'
+type Filter = 'all' | 'open' | 'closed' | 'long' | 'short';
 
-const FILTERS: {label:string, value:Filter}[] = [
-    {label:'Все',value:'all'},
-    {label:'Открытые',value:'open'},
-    {label:'Закрытые',value:'closed'},
-    {label:'Лонг',value:'long'},
-    {label:'Шорт',value:'short'},
-]
+const FILTERS: { label: string; value: Filter }[] = [
+  { label: 'Все', value: 'all' },
+  { label: 'Открытые', value: 'open' },
+  { label: 'Закрытые', value: 'closed' },
+  { label: 'Лонг', value: 'long' },
+  { label: 'Шорт', value: 'short' },
+];
 
-export const TradeHistoryScreen = () => {
+const TradeHistoryScreen = () => {
 
-    const [trades,setTrades] = useState<Trade[]>([])
-    const [filter,setFilter] = useState<Filter>('all')
-    const [search,setSearch] = useState('')
+  const [trades, setTrades] = useState<Trade[]>([]);
+  const [filter, setFilter] = useState<Filter>('all');
+  const [search, setSearch] = useState('');
 
-    useFocusEffect(useCallback(()=>{
-        StorageService.getTrades().then(setTrades)
-    },[]))
+  useFocusEffect(useCallback(() => {
+    StorageService.getTrades().then(setTrades);
+  }, []));
 
-    const filtred = trades.filter(t => {
-        const matchFilter = 
-            filter === 'all' ? true :
-            filter === 'open' ? t.status === 'open':
-            filter === 'closed' ? t.status === 'close':
-            filter === 'long' ? t.direction === 'long':
-            t.direction === 'short'
-        const matchSearch = search ? t.symbol.toLowerCase().includes(search.toLowerCase()) : true
-        return matchFilter && matchSearch
-    })
+  const filtered = trades.filter(t => {
+    const matchFilter =
+      filter === 'all' ? true :
+      filter === 'open' ? t.status === 'open' :
+      filter === 'closed' ? t.status === 'close' :
+      filter === 'long' ? t.direction === 'long' :
+      t.direction === 'short';
+    const matchSearch = search
+      ? t.symbol.toLowerCase().includes(search.toLowerCase())
+      : true;
+    return matchFilter && matchSearch;
+  });
 
-    const totalPnL = filtred.filter(t => t.status === 'close').reduce((s,t)=> s + (t.profit ?? 0),0)
+  const totalPnL = filtered
+    .filter(t => t.status === 'close')
+    .reduce((s, t) => s + (t.profit ?? 0), 0);
 
-    return (
-        <SafeAreaView style={styles.root}>
+  return (
+    <SafeAreaView style={styles.root}>
 
-            <View style={styles.header}>
-                <Text style={styles.title}>История сделок</Text>
-                <Text style={styles.subtitle}>{trades.length}</Text>
+      <View style={styles.header}>
+        <Text style={styles.title}>История сделок</Text>
+        <Text style={styles.subtitle}>{trades.length} сделок</Text>
+      </View>
+
+      <View style={styles.searchBox}>
+        <Text style={styles.searchIcon}>🔍</Text>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Поиск по символу..."
+          placeholderTextColor="#BDBDBD"
+          value={search}
+          onChangeText={setSearch}
+        />
+        {search.length > 0 && (
+          <TouchableOpacity onPress={() => setSearch('')}>
+            <Text style={styles.clearX}>✕</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+
+      {/* Фильтры */}
+      <View style={styles.filterRow}>
+        {FILTERS.map(f => (
+          <TouchableOpacity
+            key={f.value}
+            style={[styles.filterBtn, filter === f.value && styles.filterBtnActive]}
+            onPress={() => setFilter(f.value)}
+          >
+            <Text style={[styles.filterText, filter === f.value && styles.filterTextActive]}>
+              {f.label}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      {/* Итоговый P&L */}
+      {filtered.some(t => t.status === 'close') && (
+        <View style={styles.summaryRow}>
+          <Text style={styles.summaryText}>Найдено: {filtered.length}</Text>
+          <Text style={[styles.summaryPnL, totalPnL >= 0 ? styles.green : styles.red]}>
+            P&L: {formatMoney(totalPnL)}
+          </Text>
+        </View>
+      )}
+
+      {/* Список */}
+      <FlatList
+        data={filtered}
+        keyExtractor={item => item.id}
+        contentContainerStyle={styles.list}
+        showsVerticalScrollIndicator={false}
+        renderItem={({ item }) => (
+          <View style={styles.row}>
+            <View style={[styles.dirDot, item.direction === 'long' ? styles.dotLong : styles.dotShort]} />
+            <View style={styles.rowMiddle}>
+              <Text style={styles.rowSymbol}>{item.symbol}</Text>
+              <Text style={styles.rowMeta}>
+                {item.market === 'spot' ? 'Спот' : 'Фьючерс'} · {item.direction === 'long' ? 'Лонг' : 'Шорт'}
+              </Text>
+              <Text style={styles.rowDate}>{item.entryDate}</Text>
             </View>
-
-            <View style={styles.searchBox}>
-                <Text style={styles.searchIcon}>🔍</Text>
-                <TextInput 
-                    style={styles.searchInput}
-                    placeholder="Поиск по символу..."
-                    placeholderTextColor='#BDBDBD'
-                    value={search}
-                    onChangeText={setSearch}
-                />
-                {search.length > 0 && (
-                    <TouchableOpacity onPress={()=>setSearch('')}>
-                        <Text style={styles.clearX}>✕</Text>
-                    </TouchableOpacity>
-                )}
-            </View>
-
-            <View style={styles.filterRow}>
-                {FILTERS.map(f => (
-                    <TouchableOpacity key={f.value} style={[styles.filterBtn, filter === f.value && styles.filterBtnActive]} onPress={()=>setFilter(f.value)}>
-                        <Text style={[styles.filterText, filter === f.value && styles.filterText]}>{f.label}</Text>
-                    </TouchableOpacity>
-                ))}
-            </View>
-
-            {filtred.some(t => t.status === 'close') && (
-                <View style={styles.summaryRow}>
-                    <Text style={styles.summaryText}>Найдено: {filtred.length}</Text>
-                    <Text style={[styles.summaryPnL, totalPnL > 0 ? styles.green : styles.red]}>P&L: {formatMoney(totalPnL)}</Text>
+            <View style={styles.rowRight}>
+              {item.status === 'close' ? (
+                <Text style={[(item.profit ?? 0) >= 0 ? styles.green : styles.red, styles.rowProfit]}>
+                  {formatMoney(item.profit ?? 0, item.currency)}
+                </Text>
+              ) : (
+                <View style={styles.openChip}>
+                  <Text style={styles.openChipText}>Открыта</Text>
                 </View>
-            )}
+              )}
+              <Text style={styles.rowPrice}>Вход: {item.entryPrice}</Text>
+            </View>
+          </View>
+        )}
+        ListEmptyComponent={
+          <View style={styles.empty}>
+            <Text style={styles.emptyIcon}>📭</Text>
+            <Text style={styles.emptyText}>Нет сделок</Text>
+          </View>
+        }
+      />
+    </SafeAreaView>
+  );
+};
 
-            <FlatList 
-                data={filtred}
-                keyExtractor={item => item.id}
-                contentContainerStyle={styles.list}
-                showsVerticalScrollIndicator={false}
-                renderItem={({item})=>(
-                    <View style={styles.row}>
-                        <View style={[styles.dirDot, item.direction === 'long' ? styles.dotLong : styles.dotShort]}>
-                            <View style={styles.rowMiddle}>
-                                <Text style={styles.rowSymbol}>{item.symbol}</Text>
-                                <Text style={styles.rowMeta}>
-                                    {item.market === 'spot' ? 'Спот' : 'Фьючерс'} · {item.direction === 'long' ? 'Лонг' : 'Шорт'}
-                                </Text>
-                                <Text style={styles.rowDate}>{item.entryDate}</Text>
-                            </View>
-                            <View style={styles.rowRight}>
-                                {item.status === 'close' ? (
-                                    <Text style={[(item.profit ?? 0) >= 0 ? styles.green : styles.red, styles.rowProfit]}>
-                                        {formatMoney(item.profit ?? 0, item.currency)}
-                                    </Text>
-                                ) : (
-                                    <View style={styles.openChip}>
-                                        <Text style={styles.openChipText}>Открыта</Text>
-                                    </View>
-                                )}
-                                <Text style={styles.rowPrice}>Вход:{item.entryPrice}</Text>
-                            </View>
-                        </View>
-                    </View>
-                )}
-                ListEmptyComponent={
-                    <View style={styles.empty}>
-                      <Text style={styles.emptyIcon}>📭</Text>
-                      <Text style={styles.emptyText}>Нет сделок</Text>
-                    </View>
-                } 
-            />
-
-        </SafeAreaView>
-    )
-}
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: '#F8F9FA' },
   header: { paddingHorizontal: 16, paddingTop: 18, paddingBottom: 10 },
@@ -157,3 +172,5 @@ const styles = StyleSheet.create({
   emptyIcon: { fontSize: 40, marginBottom: 12 },
   emptyText: { fontSize: 16, fontWeight: '600', color: '#1A1A1A' },
 });
+
+export default TradeHistoryScreen;
