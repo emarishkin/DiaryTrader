@@ -1,9 +1,11 @@
 import { useCallback, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Trade } from "../types";
 import { useFocusEffect } from "@react-navigation/native";
 import { StorageService } from "../storage/storage";
+import { FlatList, TextInput } from "react-native-gesture-handler";
+import { formatMoney } from "../utils/tradeUtils";
 
 type Filter = 'all' |'open' | 'closed' | 'long' | 'short'
 
@@ -40,10 +42,81 @@ export const TradeHistoryScreen = () => {
 
     return (
         <SafeAreaView style={styles.root}>
+
             <View style={styles.header}>
                 <Text style={styles.title}>История сделок</Text>
                 <Text style={styles.subtitle}>{trades.length}</Text>
             </View>
+
+            <View style={styles.searchBox}>
+                <Text style={styles.searchIcon}>🔍</Text>
+                <TextInput 
+                    style={styles.searchInput}
+                    placeholder="Поиск по символу..."
+                    placeholderTextColor='#BDBDBD'
+                    value={search}
+                    onChangeText={setSearch}
+                />
+                {search.length > 0 && (
+                    <TouchableOpacity onPress={()=>setSearch('')}>
+                        <Text style={styles.clearX}>✕</Text>
+                    </TouchableOpacity>
+                )}
+            </View>
+
+            <View style={styles.filterRow}>
+                {FILTERS.map(f => (
+                    <TouchableOpacity key={f.value} style={[styles.filterBtn, filter === f.value && styles.filterBtnActive]} onPress={()=>setFilter(f.value)}>
+                        <Text style={[styles.filterText, filter === f.value && styles.filterText]}>{f.label}</Text>
+                    </TouchableOpacity>
+                ))}
+            </View>
+
+            {filtred.some(t => t.status === 'close') && (
+                <View style={styles.summaryRow}>
+                    <Text style={styles.summaryText}>Найдено: {filtred.length}</Text>
+                    <Text style={[styles.summaryPnL, totalPnL > 0 ? styles.green : styles.red]}>P&L: {formatMoney(totalPnL)}</Text>
+                </View>
+            )}
+
+            <FlatList 
+                data={filtred}
+                keyExtractor={item => item.id}
+                contentContainerStyle={styles.list}
+                showsVerticalScrollIndicator={false}
+                renderItem={({item})=>(
+                    <View style={styles.row}>
+                        <View style={[styles.dirDot, item.direction === 'long' ? styles.dotLong : styles.dotShort]}>
+                            <View style={styles.rowMiddle}>
+                                <Text style={styles.rowSymbol}>{item.symbol}</Text>
+                                <Text style={styles.rowMeta}>
+                                    {item.market === 'spot' ? 'Спот' : 'Фьючерс'} · {item.direction === 'long' ? 'Лонг' : 'Шорт'}
+                                </Text>
+                                <Text style={styles.rowDate}>{item.entryDate}</Text>
+                            </View>
+                            <View style={styles.rowRight}>
+                                {item.status === 'close' ? (
+                                    <Text style={[(item.profit ?? 0) >= 0 ? styles.green : styles.red, styles.rowProfit]}>
+                                        {formatMoney(item.profit ?? 0, item.currency)}
+                                    </Text>
+                                ) : (
+                                    <View style={styles.openChip}>
+                                        <Text style={styles.openChipText}>Открыта</Text>
+                                    </View>
+                                )}
+                                <Text style={styles.rowPrice}>Вход:{item.entryPrice}</Text>
+                            </View>
+                        </View>
+                    </View>
+                )}
+                ListEmptyComponent={
+                    <View style={styles.empty}>
+                      <Text style={styles.emptyIcon}>📭</Text>
+                      <Text style={styles.emptyText}>Нет сделок</Text>
+                    </View>
+                } 
+            />
+
         </SafeAreaView>
     )
 }
