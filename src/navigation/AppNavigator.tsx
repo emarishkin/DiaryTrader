@@ -6,6 +6,7 @@ import AddTradeScreen  from "../screens/AddTradeScreen";
 import StatisticsScreen from "../screens/StatisticsScreen";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import TradeHistoryScreen from "../screens/TradeHistoryScreen";
+import { StrategiesScreen  } from "../screens/StrategiesScreen";
 
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator()
@@ -48,6 +49,15 @@ const DashboardStack = () => {
     )
 }
 
+const StatisticsStack = () => {
+    return (
+        <Stack.Navigator screenOptions={{headerShown:false}}>
+            <Stack.Screen name="StatisticsHome" component={StatisticsScreen} />
+            <Stack.Screen name="Strategies" component={StrategiesScreen} />
+        </Stack.Navigator>
+    )
+}
+
 export const AppNavigator = () => {
     return(
         <Tab.Navigator
@@ -77,7 +87,7 @@ export const AppNavigator = () => {
 
             <Tab.Screen 
                 name="Statistics"
-                component={StatisticsScreen}
+                component={StatisticsStack}
                 options={{
                     tabBarIcon:({focused}) => (
                         <TabIcon source={icons.statistics} focused={focused} />

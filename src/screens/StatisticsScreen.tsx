@@ -1,12 +1,14 @@
 import { useCallback, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native"
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Trade } from "../types";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { StorageService } from "../storage/storage";
 import { formatMoney } from "../utils/tradeUtils";
 
 const StatisticsScreen = () => {
+
+    const navigation = useNavigation<any>()
 
     const [trades,setTrades] = useState<Trade[]>([])
 
@@ -116,6 +118,11 @@ const StatisticsScreen = () => {
                         </View>
                     </>
                 )}
+
+                <TouchableOpacity style={styles.strategiesBtn} onPress={()=>navigation.navigate('Strategies')} activeOpacity={0.8}>
+                    <Text style={styles.strategiesBtnLeft}>📋  Мои стратегии</Text>
+                </TouchableOpacity>
+
                 <View style={{ height: 100 }} />
             </ScrollView>
         </SafeAreaView>
@@ -146,6 +153,9 @@ const StatisticsScreen = () => {
   lossRow: { backgroundColor: '#FFEBEE' },
   extremeSymbol: { fontSize: 14, fontWeight: '600', color: '#1A1A1A' },
   extremeVal: { fontSize: 14, fontWeight: '700' },
+  strategiesBtn: { backgroundColor: '#FFF', borderRadius: 14, paddingVertical: 16, paddingHorizontal: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 6, borderWidth: 1.5, borderColor: '#E3F2FD' },
+  strategiesBtnLeft: { fontSize: 15, fontWeight: '600', color: '#1A1A1A' },
+  strategiesBtnRight: { fontSize: 13, color: '#1E88E5', fontWeight: '500' },
 });
 
 export default StatisticsScreen
