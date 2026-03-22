@@ -168,4 +168,5 @@ const styles = StyleSheet.create({
   addIconActive: {
     tintColor: '#FFFFFF',
   },
+  
 });

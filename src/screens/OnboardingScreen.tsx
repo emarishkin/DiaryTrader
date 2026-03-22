@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native"
+import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import Onboarding from "react-native-onboarding-swiper"
 
 export const OnboardingScreen = ({navigation}:any) => {
@@ -38,7 +38,7 @@ export const OnboardingScreen = ({navigation}:any) => {
                                         TraderDiary
                                     </Text>
                                 </Text>
-                                <Text style={styles.pageEmoji}>📒</Text>
+                                <Image source={require('../../assets/KorsisLogo.png')} style={styles.pageImage} resizeMode="contain" />
                                 <Text style={styles.pageText}>
                                     Твой личный дневник трейдера для анализа сделок и роста прибыли
                                 </Text>
@@ -55,7 +55,7 @@ export const OnboardingScreen = ({navigation}:any) => {
                                     Записывай{'\n'}
                                     <Text style={styles.pageTitleBig}>сделки</Text>
                                 </Text>
-                                <Text style={styles.pageEmoji}>📈</Text>
+                                <Image source={require('../../assets/deary.png')} style={styles.pageImage} resizeMode="contain" />
                                 <Text style={styles.pageText}>
                                     Фиксируй входы и выходы, стоп-лоссы и тейк-профиты. Автоматический расчёт P&L и риск/прибыль
                                 </Text>
@@ -72,7 +72,7 @@ export const OnboardingScreen = ({navigation}:any) => {
                                     Анализируй{'\n'}
                                     <Text style={styles.pageTitleBig}>статистику</Text>
                                 </Text>
-                                <Text style={styles.pageEmoji}>📊</Text>
+                                <Image source={require('../../assets/stats.png')} style={styles.pageImage} resizeMode="contain" />
                                 <Text style={styles.pageText}>
                                     Винрейт, профит-фактор, лучшие и худшие сделки. Всё для улучшения торговли
                                 </Text>
@@ -89,7 +89,7 @@ export const OnboardingScreen = ({navigation}:any) => {
                                     Строй{'\n'}
                                     <Text style={styles.pageTitleBig}>стратегии</Text>
                                 </Text>
-                                <Text style={styles.pageEmoji}>🧠</Text>
+                                <Image source={require('../../assets/strategies.png')} style={styles.pageImage} resizeMode="contain" />
                                 <Text style={styles.pageText}>
                                     Сохраняй торговые стратегии и применяй их при добавлении сделок
                                 </Text>
@@ -191,4 +191,9 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
   },
+  pageImage: {
+  width: 350,
+  height: 350,
+  marginBottom: 0,
+},
 });
