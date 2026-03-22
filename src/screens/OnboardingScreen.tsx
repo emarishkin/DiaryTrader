@@ -1,16 +1,115 @@
 import { useState } from "react"
-import { Platform, StyleSheet, View } from "react-native"
+import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native"
+import Onboarding from "react-native-onboarding-swiper"
 
 export const OnboardingScreen = ({navigation}:any) => {
 
     const [currentPage,setCurrentPage] = useState(0)
 
-    const HiddenButton = () => {}
+    const HiddenButton = () => null
 
     const goToMain = () => navigation.replace('Main')
 
     return (
-        <View style={{flex:1}}>
+        <View style={styles.root}>
+            <Onboarding 
+                onSkip={goToMain}
+                onDone={goToMain}
+                SkipButtonComponent={HiddenButton}
+                NextButtonComponent={HiddenButton}
+                DoneButtonComponent={HiddenButton}
+                bottomBarColor="transparent"
+                bottomBarHighlight={false}
+                showPagination={true}
+                pageIndexCallback={(index:number)=> setCurrentPage(index)}
+                DotComponent={({selected}: any)=>(
+                    <View style={[styles.dot, selected && styles.dotActive]} />
+                )}
+                containerStyles={styles.container}
+                titleStyles={styles.hidden}
+                subTitleStyles={styles.hidden}
+                pages={[
+                    {
+                        backgroundColor:'#1E88E5',
+                        image:(
+                            <View style={styles.page}>
+                                <Text style={styles.pageTitle}>Добро пожаловать в{'\n'}
+                                    <Text style={styles.pageTitleBig}>
+                                        TraderDiary
+                                    </Text>
+                                </Text>
+                                <Text style={styles.pageEmoji}>📒</Text>
+                                <Text style={styles.pageText}>
+                                    Твой личный дневник трейдера для анализа сделок и роста прибыли
+                                </Text>
+                            </View>
+                        ),
+                        title:'',
+                        subtitle:'',
+                    },
+                    {
+                        backgroundColor: '#2E7D32',
+                        image: (
+                            <View style={styles.page}>
+                                <Text style={styles.pageTitle}>
+                                    Записывай{'\n'}
+                                    <Text style={styles.pageTitleBig}>сделки</Text>
+                                </Text>
+                                <Text style={styles.pageEmoji}>📈</Text>
+                                <Text style={styles.pageText}>
+                                    Фиксируй входы и выходы, стоп-лоссы и тейк-профиты. Автоматический расчёт P&L и риск/прибыль
+                                </Text>
+                            </View>
+                        ),
+                        title: '',
+                        subtitle: '',
+                    },
+                    {
+                        backgroundColor: '#F59E0B',
+                        image: (
+                            <View style={styles.page}>
+                                <Text style={styles.pageTitle}>
+                                    Анализируй{'\n'}
+                                    <Text style={styles.pageTitleBig}>статистику</Text>
+                                </Text>
+                                <Text style={styles.pageEmoji}>📊</Text>
+                                <Text style={styles.pageText}>
+                                    Винрейт, профит-фактор, лучшие и худшие сделки. Всё для улучшения торговли
+                                </Text>
+                            </View>
+                        ),
+                        title: '',
+                        subtitle: '',
+                    },
+                    {
+                        backgroundColor: '#6C3483',
+                        image: (
+                            <View style={styles.page}>
+                                <Text style={styles.pageTitle}>
+                                    Строй{'\n'}
+                                    <Text style={styles.pageTitleBig}>стратегии</Text>
+                                </Text>
+                                <Text style={styles.pageEmoji}>🧠</Text>
+                                <Text style={styles.pageText}>
+                                    Сохраняй торговые стратегии и применяй их при добавлении сделок
+                                </Text>
+                            </View>
+                        ),
+                        title: '',
+                        subtitle: '',
+                    },
+                ]}
+            />
+
+            <TouchableOpacity style={styles.skipBtn} onPress={goToMain}>
+                <Text style={styles.skipBtnText}>Пропустить</Text>
+            </TouchableOpacity>
+
+            {currentPage === 3 && (
+                <TouchableOpacity style={styles.startBtn} onPress={goToMain}>
+                    <Text style={[styles.startBtnText,{color:'#6C3483'}]}>Начнём! 🚀</Text>
+                </TouchableOpacity>
+            )}
 
         </View>
     )
