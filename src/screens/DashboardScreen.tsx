@@ -23,7 +23,7 @@ const DashboardScreen = () => {
       StorageService.getTrades().then(setTrades)
     }, []))
 
-   const navigation = useNavigation();
+   const navigation = useNavigation<any>();
 
     const onRefresh = async () => {
       setRefreshing(true)
@@ -97,7 +97,7 @@ const DashboardScreen = () => {
                     </View>
                 ) : (
                     filtred.map(t=>(
-                      <View style={styles.card} key={t.id}>
+                      <TouchableOpacity key={t.id} style={styles.card} onPress={()=>navigation.navigate('TradeDetail', {tradeId: t.id})} activeOpacity={0.75}>
                         <View style={[styles.dirBadge, t.direction === 'long' ? styles.longBg : styles.shortBg]}>
                           <Text style={[styles.dirText, t.direction === 'long' ? styles.longColor : styles.shortColor]}>
                             {t.direction === 'long' ? 'ЛОНГ' : 'ШОРТ'}
@@ -113,7 +113,7 @@ const DashboardScreen = () => {
                             <Text style={styles.openChipText}>Открыта</Text>
                           </View>
                         </View>
-                      </View>
+                      </TouchableOpacity>
                     ))
                 )}
 

@@ -1,12 +1,13 @@
 import React, { useState, useCallback } from 'react';
 import {
   View, Text, StyleSheet, FlatList,
-  TextInput, TouchableOpacity, SafeAreaView,
+  TextInput, TouchableOpacity, 
 } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { Trade } from '../types';
 import { StorageService } from '../storage/storage';
 import { formatMoney } from '../utils/tradeUtils';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type Filter = 'all' | 'open' | 'closed' | 'long' | 'short';
 
@@ -19,6 +20,8 @@ const FILTERS: { label: string; value: Filter }[] = [
 ];
 
 const TradeHistoryScreen = () => {
+
+  const navigation = useNavigation<any>()
 
   const [trades, setTrades] = useState<Trade[]>([]);
   const [filter, setFilter] = useState<Filter>('all');
@@ -69,7 +72,6 @@ const TradeHistoryScreen = () => {
         )}
       </View>
 
-      {/* Фильтры */}
       <View style={styles.filterRow}>
         {FILTERS.map(f => (
           <TouchableOpacity
@@ -84,7 +86,6 @@ const TradeHistoryScreen = () => {
         ))}
       </View>
 
-      {/* Итоговый P&L */}
       {filtered.some(t => t.status === 'close') && (
         <View style={styles.summaryRow}>
           <Text style={styles.summaryText}>Найдено: {filtered.length}</Text>
@@ -94,14 +95,13 @@ const TradeHistoryScreen = () => {
         </View>
       )}
 
-      {/* Список */}
       <FlatList
         data={filtered}
         keyExtractor={item => item.id}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
         renderItem={({ item }) => (
-          <View style={styles.row}>
+          <TouchableOpacity style={styles.row} onPress={()=>navigation.navigate('TradeDetail', {tradeId: item.id})} activeOpacity={0.75}>
             <View style={[styles.dirDot, item.direction === 'long' ? styles.dotLong : styles.dotShort]} />
             <View style={styles.rowMiddle}>
               <Text style={styles.rowSymbol}>{item.symbol}</Text>
@@ -122,7 +122,7 @@ const TradeHistoryScreen = () => {
               )}
               <Text style={styles.rowPrice}>Вход: {item.entryPrice}</Text>
             </View>
-          </View>
+          </TouchableOpacity>
         )}
         ListEmptyComponent={
           <View style={styles.empty}>
