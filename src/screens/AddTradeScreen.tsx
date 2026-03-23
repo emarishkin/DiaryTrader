@@ -254,7 +254,7 @@ const AddTradeScreen = () => {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: '#1d1d29' },
   content: { paddingHorizontal: 16 },
-  title: { fontSize: 26, fontWeight: '700', color: '#FFFFFF', paddingTop: 18, paddingBottom: 16 },
+  title: { paddingHorizontal: 16,fontSize: 26, fontWeight: '700', color: '#FFFFFF', paddingTop: 18, paddingBottom: 16 },
   groupLabel: { fontSize: 12, fontWeight: '600', color: '#555577', marginBottom: 8, textTransform: 'uppercase' },
   fieldLabel: { fontSize: 12, fontWeight: '600', color: '#555577', marginBottom: 5, textTransform: 'uppercase' },
   toggleRow: { flexDirection: 'row', gap: 8, marginBottom: 16 },

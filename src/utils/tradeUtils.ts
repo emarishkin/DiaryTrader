@@ -29,8 +29,8 @@ export const calculateRiskReward = (entryPrice:number,stopLoss:number,takeProfit
 export const formatMoney = (value:number,currency: string = 'RUB'):string => {
     const symbol = currency === 'RUB' ? '₽': currency === 'USD' ? '$' : currency === 'EUR' ? '€': currency
     const abs = Math.abs(value).toLocaleString('ru-RU',{
-        minimumFractionDigits:2,
-        maximumFractionDigits:2
+        minimumFractionDigits:1,
+        maximumFractionDigits:1
     })
     return value >= 0 ? `+${abs} ${symbol}` : `-${abs} ${symbol}`;
 }
