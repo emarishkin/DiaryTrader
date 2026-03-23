@@ -103,23 +103,23 @@ export const AppNavigator = () => {
 
 const styles = StyleSheet.create({
   tabBar: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A1A24',
     borderTopWidth: 0,
     elevation: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 20,
     height: 70,
     borderRadius: 32,
     marginHorizontal: 26,
     marginBottom: 26,
     position: 'absolute',
-    paddingBottom: 0,  
-    paddingTop: 16 ,
+    paddingBottom: 0,
+    paddingTop: 16,
+    borderWidth: 1.5,
+    borderColor: '#2A2A38',
   },
-
-  // Обычная иконка
   iconWrapper: {
     width: 44,
     height: 44,
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
     borderRadius: 22,
   },
   iconWrapperActive: {
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#1A2A4A',
     transform: [{ scale: 1.05 }],
   },
   icon: {
@@ -136,37 +136,33 @@ const styles = StyleSheet.create({
     height: 30,
   },
   iconInactive: {
-    tintColor: '#9E9E9E',
-    opacity: 0.6,
+    tintColor: '#555577',
+    opacity: 0.8,
   },
   iconActive: {
-    tintColor: '#1E88E5',
+    tintColor: '#2979FF',
   },
-
-  // Кнопка добавить
   addWrapper: {
     width: 44,
     height: 44,
-    borderRadius: 26,
-    backgroundColor: '#F0F0F0',
+    borderRadius: 22,
+    backgroundColor: '#13131C',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 0,
     borderWidth: 2,
-    borderColor: '#E0E0E0',
+    borderColor: '#2A2A38',
   },
   addWrapperActive: {
-    backgroundColor: '#1E88E5',
-    borderColor: '#1E88E5',
+    backgroundColor: '#2979FF',
+    borderColor: '#2979FF',
     transform: [{ scale: 1.05 }],
   },
   addIcon: {
     width: 24,
     height: 24,
-    tintColor: '#9E9E9E',
+    tintColor: '#555577',
   },
   addIconActive: {
     tintColor: '#FFFFFF',
   },
-  
 });

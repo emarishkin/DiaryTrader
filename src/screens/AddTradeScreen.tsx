@@ -252,163 +252,51 @@ const AddTradeScreen = () => {
   }
 
 const styles = StyleSheet.create({
-    root:{
-        flex:1,
-        backgroundColor:'#F8F9FA'
-    },
-    content:{
-        paddingHorizontal:16
-    },
-    title:{
-        paddingHorizontal:16,
-        fontSize:26,
-        fontWeight:'700',
-        color:'#1A1A1A',
-        paddingTop:18,
-        paddingBottom:16
-    },
-    groupLabel:{
-        fontSize:12,
-        fontWeight:'600',
-        color:'#757575',
-        marginBottom:8,
-        textTransform:'uppercase'
-    },
-    fieldLabel: { 
-        fontSize: 12, 
-        fontWeight: '600', 
-        color: '#757575', 
-        marginBottom: 5, 
-        textTransform: 'uppercase' 
-    },
-    toggleRow:{
-        flexDirection:'row',
-        gap:8,
-        marginBottom:16
-    },
-    toggleBtn:{
-        flex:1,
-        paddingVertical:10,
-        borderRadius:10,
-        alignItems:'center',
-        backgroundColor:'#F0F0F0',
-        borderWidth:1,
-        borderColor:'#E0E0E0'
-    },
-    toggleBtnActive: {
-        backgroundColor: '#1E88E5',
-        borderColor: '#1E88E5' 
-    },
-    toggleLong: { 
-        backgroundColor: '#2E7D32', 
-        borderColor: '#2E7D32' 
-    },
-    toggleShort: { 
-        backgroundColor: '#C62828', 
-        borderColor: '#C62828' 
-    },
-    toggleText: { 
-        fontSize: 14, 
-        fontWeight: '600', 
-        color: '#757575' 
-    },
-    toggleTextActive: { 
-        color: '#FFF' 
-    },
-    row2: { 
-        flexDirection: 'row', 
-        gap: 12 
-    },
-    input: {
-        backgroundColor: '#FFF', 
-        borderRadius: 10, 
-        borderWidth: 1, 
-        borderColor: '#E0E0E0',
-        paddingHorizontal: 12, 
-        paddingVertical: Platform.OS === 'ios' ? 12 : 8,
-        fontSize: 15, 
-        color: '#1A1A1A', 
-        marginBottom: 12,
-    },
-    currencyBox: { 
-        width: 90 
-    },
-    currencyPill: {
-        backgroundColor: '#FFF', 
-        borderRadius: 10, 
-        borderWidth: 1, 
-        borderColor: '#E0E0E0',
-        paddingHorizontal: 12, 
-        paddingVertical: Platform.OS === 'ios' ? 12 : 9, 
-        marginBottom: 12,
-    },
-    currencyText: { 
-        fontSize: 15, 
-        fontWeight: '600', 
-        color: '#1A1A1A' 
-    },
-    rrRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#F0F4FF',
-        borderRadius: 10,
-        paddingHorizontal: 14,
-        paddingVertical: 10,
-        marginBottom: 12,
-    },
-    rrLabel: { 
-        fontSize: 13, 
-        color: '#546E7A', 
-        flex: 1 
-    },
-    rrValue: { 
-        fontSize: 15, 
-        fontWeight: '700', 
-        color: '#9E9E9E' 
-    },
-    rrAccent: { 
-        color: '#1E88E5' 
-    },
-    sectionDivider: {
-        fontSize: 12, fontWeight: '600', color: '#9E9E9E',
-        textTransform: 'uppercase', marginVertical: 12,
-        borderTopWidth: 1, borderTopColor: '#EEEEEE', paddingTop: 14,
-    },
-    inputMultiline: { 
-        height: 80, 
-        textAlignVertical: 'top' 
-    },
-    btnRow: { 
-        flexDirection: 'row', 
-        gap: 12, 
-        marginTop: 8 
-    },
-    clearBtn: {
-        flex: 1, 
-        backgroundColor: '#FFEBEE', 
-        borderRadius: 12,
-        paddingVertical: 15, 
-        alignItems: 'center',
-        borderWidth: 1, 
-        borderColor: '#FFCDD2',
-    },
-    clearBtnText: { 
-        color: '#C62828', 
-        fontSize: 15, 
-        fontWeight: '700' 
-    },
-    saveBtn: { 
-        flex: 2, 
-        backgroundColor: '#2E7D32', 
-        borderRadius: 12, 
-        paddingVertical: 15, 
-        alignItems: 'center' 
-    },
-    saveBtnText: { 
-        color: '#FFF', 
-        fontSize: 15, 
-        fontWeight: '700' 
-    },
-})
+  root: { flex: 1, backgroundColor: '#1d1d29' },
+  content: { paddingHorizontal: 16 },
+  title: { fontSize: 26, fontWeight: '700', color: '#FFFFFF', paddingTop: 18, paddingBottom: 16 },
+  groupLabel: { fontSize: 12, fontWeight: '600', color: '#555577', marginBottom: 8, textTransform: 'uppercase' },
+  fieldLabel: { fontSize: 12, fontWeight: '600', color: '#555577', marginBottom: 5, textTransform: 'uppercase' },
+  toggleRow: { flexDirection: 'row', gap: 8, marginBottom: 16 },
+  toggleBtn: { flex: 1, paddingVertical: 10, borderRadius: 10, alignItems: 'center', backgroundColor: '#1A1A24', borderWidth: 1, borderColor: '#2A2A38' },
+  toggleBtnActive: { backgroundColor: '#2979FF', borderColor: '#2979FF' },
+  toggleLong: { backgroundColor: '#0D2E1A', borderColor: '#1B5E35' },
+  toggleShort: { backgroundColor: '#2E0D0D', borderColor: '#5E1B1B' },
+  toggleText: { fontSize: 14, fontWeight: '600', color: '#555577' },
+  toggleTextActive: { color: '#FFF' },
+  row2: { flexDirection: 'row', gap: 12 },
+  input: {
+    backgroundColor: '#1A1A24', borderRadius: 10, borderWidth: 1, borderColor: '#2A2A38',
+    paddingHorizontal: 12, paddingVertical: Platform.OS === 'ios' ? 12 : 8,
+    fontSize: 15, color: '#FFFFFF', marginBottom: 12,
+  },
+  inputMultiline: { height: 80, textAlignVertical: 'top' },
+  currencyBox: { width: 90 },
+  currencyPill: {
+    backgroundColor: '#1A1A24', borderRadius: 10, borderWidth: 1, borderColor: '#2A2A38',
+    paddingHorizontal: 12, paddingVertical: Platform.OS === 'ios' ? 12 : 9, marginBottom: 12,
+  },
+  currencyText: { fontSize: 15, fontWeight: '600', color: '#FFFFFF' },
+  rrRow: {
+    flexDirection: 'row', alignItems: 'center', backgroundColor: '#13131C',
+    borderRadius: 10, paddingHorizontal: 14, paddingVertical: 10, marginBottom: 12,
+    borderWidth: 1, borderColor: '#2A2A38',
+  },
+  rrLabel: { fontSize: 13, color: '#555577', flex: 1 },
+  rrValue: { fontSize: 15, fontWeight: '700', color: '#555577' },
+  rrAccent: { color: '#2979FF' },
+  sectionDivider: {
+    fontSize: 12, fontWeight: '600', color: '#555577', textTransform: 'uppercase',
+    marginVertical: 12, borderTopWidth: 1, borderTopColor: '#2A2A38', paddingTop: 14,
+  },
+  btnRow: { flexDirection: 'row', gap: 12, marginTop: 8 },
+  clearBtn: {
+    flex: 1, backgroundColor: '#2E0D0D', borderRadius: 12, paddingVertical: 15,
+    alignItems: 'center', borderWidth: 1, borderColor: '#5E1B1B',
+  },
+  clearBtnText: { color: '#F44336', fontSize: 15, fontWeight: '700' },
+  saveBtn: { flex: 2, backgroundColor: '#0D2E1A', borderRadius: 12, paddingVertical: 15, alignItems: 'center', borderWidth: 1, borderColor: '#1B5E35' },
+  saveBtnText: { color: '#4CAF50', fontSize: 15, fontWeight: '700' },
+});
 
 export default AddTradeScreen
