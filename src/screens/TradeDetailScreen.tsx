@@ -145,6 +145,59 @@ export const TradeDetailScreen = () => {
                     </View>
                 )}
 
+                {(trade.confidence || trade.emotion || trade.followedPlan !== undefined) && (
+                    <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>🧠 Психология сделки</Text>
+
+                        {trade.confidence && (
+                            <View style={styles.infoRow}>
+                                <Text style={styles.infoLabel}>Уверенность</Text>
+                                <View style={[
+                                    styles.psychBadge,
+                                    trade.confidence === 'low' ? styles.psychLow :
+                                    trade.confidence === 'medium' ? styles.psychMedium :
+                                    styles.psychHigh
+                                ]}> 
+                                    <Text style={styles.psychBadgeText}>
+                                        {
+                                            trade.confidence === 'low' ? '😟 Низкая' :
+                                            trade.confidence === 'medium' ? '😐 Средняя':
+                                            '💪 Высокая'
+                                        }
+                                    </Text>
+                                </View>
+                            </View>
+                        )}
+                        {trade.emotion && (
+                            <View style={styles.infoRow}>
+                                <Text style={styles.infoLabel}>Эмоция</Text>
+                                <View style={[styles.psychBadge,
+                                    trade.emotion === 'fear' ? styles.psychFear :
+                                    trade.emotion === 'neutral' ? styles.psychNeutral :
+                                    styles.psychGreed
+                                ]}>
+                                    <Text style={styles.psychBadgeText}>
+                                        {
+                                            trade.emotion === 'fear' ? '😨 Страх' :
+                                            trade.emotion === 'neutral' ? '😐 Нейтрально' :
+                                            '🤑 Жадность'
+                                        }
+                                    </Text>
+                                </View>
+                            </View>
+                        )}
+
+                        {trade.followedPlan !== undefined && (
+                            <View style={styles.infoRow}>
+                                <Text style={styles.infoLabel}>Соблюдение плана</Text>
+                                <View style={[styles.psychBadge,trade.followedPlan ? styles.psychHigh : styles.psychLow]}>
+                                    <Text style={styles.psychBadgeText}>{trade.followedPlan ? '✅ Да' : '❌ Нет'}</Text>
+                                </View>
+                            </View>
+                        )}
+                    </View>
+                )}
+
                 {trade.status === 'open' && (
                     <TouchableOpacity style={styles.closeBtn} onPress={()=>setCloseModal(true)} activeOpacity={0.85}>
                         <Text style={styles.closeBtnText}>✅ Закрыть сделку</Text>
@@ -240,4 +293,20 @@ const styles = StyleSheet.create({
   cancelBtnText: { fontSize: 15, fontWeight: '600', color: '#555577' },
   confirmBtn: { flex: 1, backgroundColor: '#4CAF50', borderRadius: 12, paddingVertical: 14, alignItems: 'center' },
   confirmBtnText: { fontSize: 15, fontWeight: '700', color: '#FFF' },
+  psychBadge: {
+  paddingHorizontal: 10,
+  paddingVertical: 4,
+  borderRadius: 8,
+  },
+  psychBadgeText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  psychLow: { backgroundColor: '#C62828' },
+  psychMedium: { backgroundColor: '#1565C0' },
+  psychHigh: { backgroundColor: '#2E7D32' },
+  psychFear: { backgroundColor: '#C62828' },
+  psychNeutral: { backgroundColor: '#1565C0' },
+  psychGreed: { backgroundColor: '#6A1B9A' },
 });
