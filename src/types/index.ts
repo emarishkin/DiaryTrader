@@ -17,6 +17,9 @@ export interface Trade {
     status:'open'|'close'
     profit?:number
     createdAt:string
+    confidence?:'low'|'medium'|'high'
+    emotion?:'fear'|'neutral'|'greed'
+    followedPlan?:boolean
 }
 
 export interface Strategy {

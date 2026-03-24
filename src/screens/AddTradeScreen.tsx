@@ -19,6 +19,9 @@ const AddTradeScreen = () => {
     const [exitDate,setExitDate] = useState('')
     const [exitPrice,setExitPrice] = useState('')
     const [notes,setNotes] = useState('')
+    const [confidence,setConfidence] = useState<'low'|'medium'|'high'|undefined>(undefined)
+    const [emotion,setEmotion] = useState<'fear'|'neutral'|'greed'|undefined>(undefined)
+    const [followedPlan,setFollowedPlan] = useState<boolean | undefined>(undefined)
     
     const ep = parseFloat(entryPrice)
     const sl = parseFloat(stopLoss)
@@ -45,6 +48,9 @@ const AddTradeScreen = () => {
         setExitDate('');
         setExitPrice('');
         setNotes('');
+        setConfidence(undefined);
+        setEmotion(undefined);
+        setFollowedPlan(undefined)
     }
 
     async function handleSave(){
@@ -70,7 +76,10 @@ const AddTradeScreen = () => {
             exitPrice:hasExit ? parseFloat(exitPrice) : undefined,
             notes:notes || undefined,
             status:hasExit ? 'close' : 'open',
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+            confidence:confidence || undefined,
+            emotion:emotion || undefined,
+            followedPlan: followedPlan
         }
 
         if(hasExit) {
@@ -235,6 +244,47 @@ const AddTradeScreen = () => {
                         multiline
                     />
 
+                    <Text style={styles.sectionDivider}>Психология сделки</Text>
+
+                    <Text style={styles.fieldLabel}>Уверенность в сделке</Text>
+                    <View style={styles.toggleRow}>
+                        {([
+                            { label: '😟 Низкая', value: 'low' },
+                            { label: '😐 Средняя', value: 'medium' },
+                            { label: '💪 Высокая', value: 'high' },
+                        ] as const).map(opt=>(
+                            <TouchableOpacity key={opt.value} style={[styles.toggleBtn,confidence === opt.value && styles.confidenceActive]} onPress={()=>setConfidence(opt.value)}>
+                                <Text style={[styles.toggleText, confidence === opt.value && styles.toggleTextActive]}>{opt.label}</Text>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+
+                    <Text style={styles.fieldLabel}>Эмоциональное состояние</Text>
+                    <View style={styles.toggleRow}>
+                        {([
+                            { label: '😨 Страх', value: 'fear' },
+                            { label: '😐 Нейтрально', value: 'neutral' },
+                            { label: '🤑 Жадность', value: 'greed' },
+                        ] as const).map(opt=>(
+                            <TouchableOpacity style={[styles.toggleBtn, emotion === opt.value && styles.emotionActive]} key={opt.value} onPress={()=>setEmotion(opt.value)}>
+                                <Text style={[styles.toggleText,emotion === opt.value && styles.toggleTextActive]}>{opt.label}</Text>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+
+                    <Text style={styles.fieldLabel}>Соблюдение торгового плана</Text>
+                    <View style={styles.planRow}>
+                        <Text style={[styles.planLabel,followedPlan === false && styles.planLabelActive]}>Нет</Text>
+                        <TouchableOpacity 
+                        style={[styles.planTrack,followedPlan && styles.planTrackActive]}
+                        onPress={()=>setFollowedPlan(prev => prev === undefined ? true : !prev)}
+                        >
+                            <View style={[styles.planThumb, followedPlan && styles.planThumbActive]} />
+                        </TouchableOpacity>
+                        <Text style={[styles.planLabel, followedPlan === true && styles.planLabelActive]}>Да</Text>
+                    </View>
+
+
                     <View style={styles.btnRow}>
                         <TouchableOpacity style={styles.clearBtn} onPress={()=>{clearForm()}}>
                             <Text style={styles.clearBtnText}>Очистить</Text>
@@ -297,6 +347,48 @@ const styles = StyleSheet.create({
   clearBtnText: { color: '#F44336', fontSize: 15, fontWeight: '700' },
   saveBtn: { flex: 2, backgroundColor: '#0D2E1A', borderRadius: 12, paddingVertical: 15, alignItems: 'center', borderWidth: 1, borderColor: '#1B5E35' },
   saveBtnText: { color: '#4CAF50', fontSize: 15, fontWeight: '700' },
-});
+  confidenceActive: { backgroundColor: '#1565C0', borderColor: '#1565C0' },
+  emotionActive: { backgroundColor: '#6A1B9A', borderColor: '#6A1B9A' },
+  planRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 12,
+    paddingHorizontal: 4,
+  },
+  planLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#555577',
+    width: 30,
+  },
+  planLabelActive: {
+    color: '#FFFFFF',
+  },
+  planTrack: {
+    width: 56,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: '#2E0D0D',
+    justifyContent: 'center',
+    paddingHorizontal: 3,
+    borderWidth: 1,
+    borderColor: '#2A2A38',
+  },
+  planTrackActive: {
+    backgroundColor: '#0D2E1A',
+    borderColor: '#1B5E35',
+  },
+  planThumb: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#F44336',
+  },
+  planThumbActive: {
+    backgroundColor: '#4CAF50',
+    alignSelf: 'flex-end',
+  },
+  });
 
 export default AddTradeScreen
