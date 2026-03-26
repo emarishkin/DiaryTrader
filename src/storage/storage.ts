@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { Strategy, Trade } from "../types";
+import { act } from "react";
 
 const TRADES_KEY = '@trader_diary:trades';
 const STRATEGIES_KEY = '@trader_diary:strategies';
@@ -60,4 +61,14 @@ export const StorageService = {
             JSON.stringify(strategies.filter(s => s.id !== id))
         )
     },
+
+    async initDefaultStrategies():Promise<void> {
+        const existing = await this.getStrategies()
+        if(existing.length === 0){
+            const {DEFAULT_STRATEGIES} = await import('../storage/defaultStrategies')
+            for( const strategy of DEFAULT_STRATEGIES){
+                await this.saveStrategy(strategy)
+            }
+        }
+    }
 }

@@ -8,6 +8,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import TradeHistoryScreen from "../screens/TradeHistoryScreen";
 import { StrategiesScreen  } from "../screens/StrategiesScreen";
 import { TradeDetailScreen } from "../screens/TradeDetailScreen";
+import { StrategyDetailScreen } from "../screens/StrategyDetailScreen";
 
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator()
@@ -56,6 +57,7 @@ const StatisticsStack = () => {
         <Stack.Navigator screenOptions={{headerShown:false}}>
             <Stack.Screen name="StatisticsHome" component={StatisticsScreen} />
             <Stack.Screen name="Strategies" component={StrategiesScreen} />
+            <Stack.Screen name="StrategyDetail" component={StrategyDetailScreen} />
         </Stack.Navigator>
     )
 }

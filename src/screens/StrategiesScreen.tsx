@@ -1,12 +1,14 @@
 import { useCallback, useState } from "react";
 import { Alert, FlatList, Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native"
 import { Strategy } from "../types";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { StorageService } from "../storage/storage";
 import { generateId } from "../utils/tradeUtils";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export const StrategiesScreen = () => {
+
+    const navigation = useNavigation<any>()
 
     const [strategies, setStrategies] = useState<Strategy[]>([])
     const [modalVisible,setModalVisible] = useState(false)
@@ -76,7 +78,7 @@ export const StrategiesScreen = () => {
                 contentContainerStyle={styles.list}
                 showsVerticalScrollIndicator={false}
                 renderItem={({item})=>(
-                    <View style={styles.card}>
+                    <TouchableOpacity style={styles.card} onPress={()=>navigation.navigate('StrategyDetail',{strategy:item})} activeOpacity={0.8}>
                         <View style={styles.cardTop}>
                             <Text style={styles.cardName}>{item.name}</Text>
                             <TouchableOpacity style={styles.deleteBtn} onPress={()=>handleDelete(item.id, item.name)}>
@@ -104,7 +106,7 @@ export const StrategiesScreen = () => {
                                 <Text style={styles.rulesText}>{item.rules}</Text>
                             </View>
                         ):null}
-                    </View>
+                    </TouchableOpacity>
                 )}
                 ListEmptyComponent={
                     <View style={styles.empty}>
