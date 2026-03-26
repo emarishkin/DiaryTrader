@@ -27,6 +27,32 @@ const StatisticsScreen = () => {
     const avgWin = wins.length > 0 ? grossProfit / wins.length : 0
     const avgLoss = losses.length > 0 ? grossLoss / losses.length : 0
 
+    const closedWithPlan = closed.filter(t => t.followedPlan !== undefined)
+    const followedWithPlan = closed.filter(t => t.followedPlan === true)
+    const followedPlanRate = closedWithPlan.length > 0 
+    ? (followedWithPlan.length / closedWithPlan.length) * 100 
+    : 0
+
+    const emotionStats = (['fear', 'nautral', 'greed'] as const).map(emotion => {
+        const trades = closed.filter(t => t.emotion === emotion)
+        const wins = closed.filter(t=>(t.profit ?? 0)>0)
+        return {
+            emotion,
+            count: trades.length,
+            winRate: trades.length > 0 ? (wins.length / trades.length) * 100 : 0
+        }
+    }).filter(e => e.count > 0)
+
+    const confidenceStats = (['low', 'medium', 'high'] as const).map(conf => {
+        const trades = closed.filter(t => t.confidence === conf)
+        const wins = closed.filter(t=>(t.profit ?? 0)>0)
+        return {
+            confidence: conf,
+            count: trades.length,
+            winRate: trades.length > 0 ? (wins.length / trades.length) * 100 : 0
+        }
+    }).filter(c => c.count > 0)
+
     return(
         <SafeAreaView style={styles.root}>
             <Text style={styles.title}>Аналитика</Text>
@@ -97,7 +123,7 @@ const StatisticsScreen = () => {
                             <Text style={styles.sectionTitle}>🏆 Лучшая/ Худшая сделка</Text>
                             {wins.length > 0 && (
                                 <View style={[styles.extremeRow,styles.winRow]}>
-                                    <Text style={styles.winRow}>
+                                    <Text style={styles.psychLabel}>
                                         🟢 {wins.sort((a,b) => (b.profit ?? 0) - (a.profit ?? 0))[0].symbol}
                                     </Text>
                                     <Text style={[styles.extremeVal, styles.green]}>
@@ -107,7 +133,7 @@ const StatisticsScreen = () => {
                             )}
                             {losses.length > 0 && (
                                 <View style={[styles.extremeRow,styles.lossRow]}>
-                                    <Text style={styles.lossRow}>
+                                    <Text style={styles.psychLabel}>
                                         🔴 {losses.sort((a,b) => (a.profit ?? 0) - (b.profit ?? 0))[0].symbol}
                                     </Text>
                                     <Text style={[styles.extremeVal,styles.red]}>
@@ -116,6 +142,90 @@ const StatisticsScreen = () => {
                                 </View>
                             )}
                         </View>
+
+                        {(closedWithPlan.length > 0 || emotionStats.length > 0 || confidenceStats.length > 0) && (
+                            <View style={styles.section}>
+                                <Text style={styles.sectionTitle}>🧠 Психологический анализ</Text>
+
+                                {closedWithPlan.length > 0 && (
+                                    <View style={styles.infoRow}>
+                                        <Text style={styles.infoLabel}>Соблюдение плана</Text>
+                                        <Text style={[styles.infoValue, followedPlanRate >= 70 ? styles.green : styles.red]}>
+                                            {followedPlanRate.toFixed(0)}%
+                                        </Text>
+                                    </View>
+                                )}
+
+                                {emotionStats.length > 0 && (
+                                    <View style={styles.psychBlock}>
+                                        <Text style={styles.psychTitle}>Винрейт по эмоциям</Text>
+                                        {emotionStats.map(e => (
+                                            <View style={styles.psychRow} key={e.emotion}>
+                                                <Text style={styles.psychLabel}>
+                                                    {
+                                                        e.emotion === 'fear' ? '😨 Страх' :
+                                                        e.emotion === 'nautral' ? '😐 Нейтрально' :
+                                                        '🤑 Жадность'
+                                                    }
+                                                </Text>
+                                                <View style={styles.psychBarTrack}>
+                                                    <View
+                                                        style={[
+                                                            styles.psychBarFill,
+                                                            {
+                                                                width: `${e.winRate}%`,
+                                                                backgroundColor:
+                                                                    e.emotion === 'fear' ? '#C62828' :
+                                                                    e.emotion === 'nautral' ? '#1565C0' :
+                                                                    '#6A1B9A'
+                                                            }
+                                                        ]}
+                                                    />
+                                                </View>
+                                                <Text style={[styles.psychPercent, e.winRate >= 50 ? styles.green : styles.red]}>
+                                                    {e.winRate.toFixed(0)}%
+                                                </Text>
+                                            </View>
+                                        ))}
+                                    </View>
+                                )}
+
+                                {confidenceStats.length > 0 && (
+                                    <View style={styles.psychBlock}>
+                                        <Text style={styles.psychTitle}>Винрейт по уверенности</Text>
+                                        {confidenceStats.map(c => (
+                                            <View style={styles.psychRow} key={c.confidence}>
+                                                <Text style={styles.psychLabel}>
+                                                    {
+                                                        c.confidence === 'low' ? '😟 Низкая' :
+                                                        c.confidence === 'medium' ? '😐 Средняя' :
+                                                        '💪 Высокая'
+                                                    }
+                                                </Text>
+                                                <View style={styles.psychBarTrack}>
+                                                    <View style={[
+                                                        styles.psychBarFill,
+                                                            {
+                                                              width: `${c.winRate}%`,
+                                                              backgroundColor:
+                                                                c.confidence === 'low' ? '#C62828' :
+                                                                c.confidence === 'medium' ? '#1565C0' :
+                                                                '#2E7D32'
+                                                            }
+                                                        ]} 
+                                                    />
+                                                </View>
+                                                <Text style={[styles.psychPercent, c.winRate >= 50 ? styles.green : styles.red]}>
+                                                    {c.winRate.toFixed(0)}%
+                                                </Text>
+                                            </View>
+                                        ))}
+                                    </View>
+                                )}
+
+                            </View>
+                        )}
+
                     </>
                 )}
 
@@ -156,6 +266,45 @@ const StatisticsScreen = () => {
   strategiesBtn: { backgroundColor: '#1A1A24', borderRadius: 14, paddingVertical: 16, paddingHorizontal: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 6, borderWidth: 1, borderColor: '#2A2A38' },
   strategiesBtnLeft: { fontSize: 15, fontWeight: '600', color: '#FFFFFF' },
   strategiesBtnRight: { fontSize: 13, color: '#2979FF', fontWeight: '500' },
-});
+  psychBlock: {
+  marginTop: 12,
+  },
+  psychTitle: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#555577',
+    textTransform: 'uppercase',
+    marginBottom: 10,
+    letterSpacing: 0.4,
+  },
+  psychRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+    gap: 8,
+  },
+  psychLabel: {
+    width: 110,
+    fontSize: 13,
+    color: '#AAAACC',
+  },
+  psychBarTrack: {
+    flex: 1,
+    height: 8,
+    backgroundColor: '#13131C',
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  psychBarFill: {
+    height: '100%',
+    borderRadius: 4,
+  },
+  psychPercent: {
+    width: 36,
+    fontSize: 13,
+    fontWeight: '700',
+    textAlign: 'right',
+  },
+  });
 
 export default StatisticsScreen
