@@ -1,9 +1,10 @@
-import { use, useState } from "react"
+import { use, useCallback, useState } from "react"
 import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { calculateRiskReward, generateId, todayString } from "../utils/tradeUtils"
-import { Trade } from "../types"
+import { Strategy, Trade } from "../types"
 import { StorageService } from "../storage/storage"
+import { useFocusEffect } from "@react-navigation/native"
 
 const AddTradeScreen = () => {
 
@@ -22,7 +23,14 @@ const AddTradeScreen = () => {
     const [confidence,setConfidence] = useState<'low'|'medium'|'high'|undefined>(undefined)
     const [emotion,setEmotion] = useState<'fear'|'neutral'|'greed'|undefined>(undefined)
     const [followedPlan,setFollowedPlan] = useState<boolean | undefined>(undefined)
+    const [setupName,setSetupName] = useState('')
+    const [strategies, setStrategies] = useState<Strategy[]>([])
+    const [showStrategyPicker, setShowStrategyPicker] = useState(false)
     
+    useFocusEffect(useCallback(()=>{
+        StorageService.getStrategies().then(setStrategies)
+    },[]))
+
     const ep = parseFloat(entryPrice)
     const sl = parseFloat(stopLoss)
     const tp = parseFloat(takeProfit)
@@ -51,6 +59,8 @@ const AddTradeScreen = () => {
         setConfidence(undefined);
         setEmotion(undefined);
         setFollowedPlan(undefined)
+        setSetupName('')
+        setShowStrategyPicker(false)
     }
 
     async function handleSave(){
@@ -79,7 +89,8 @@ const AddTradeScreen = () => {
             createdAt: new Date().toISOString(),
             confidence:confidence || undefined,
             emotion:emotion || undefined,
-            followedPlan: followedPlan
+            followedPlan: followedPlan,
+            setupName:setupName || undefined
         }
 
         if(hasExit) {
@@ -244,6 +255,31 @@ const AddTradeScreen = () => {
                         multiline
                     />
 
+                    <Text style={styles.fieldLabel}>Стратегия</Text>
+                    <TouchableOpacity style={styles.strategyPicker} onPress={()=>setShowStrategyPicker(!showStrategyPicker)} activeOpacity={0.8}>
+                        <Text style={setupName ? styles.strategyText : styles.strategyPlaceholder}>
+                            {setupName || 'Выберите стратегию...'}
+                        </Text>
+                        <Text style={styles.strategyArrow}>▼</Text>
+                    </TouchableOpacity>
+                    {showStrategyPicker && (
+                        <View style={styles.strategyDropdown}>
+                            <TouchableOpacity style={styles.strategyItem} onPress={()=>{setSetupName(''); setShowStrategyPicker(false)}}>
+                                <Text style={styles.strategyItemEmpty}>— Без стратегии —</Text>
+                            </TouchableOpacity>
+                            {strategies.map(s => (
+                                <TouchableOpacity style={styles.strategyItem} key={s.id} onPress={() => {setSetupName(s.name); setShowStrategyPicker(false)}}>
+                                    <Text style={styles.strategyItemText}>{s.name}</Text>
+                                </TouchableOpacity>
+                            ))}
+                            {strategies.length === 0 && (
+                                <Text style={styles.strategyEmpty}>
+                                    Нет стратегий. Добавьте в разделе Аналитика
+                                </Text>
+                            )}
+                        </View>
+                    )}
+
                     <Text style={styles.sectionDivider}>Психология сделки</Text>
 
                     <Text style={styles.fieldLabel}>Уверенность в сделке</Text>
@@ -389,6 +425,38 @@ const styles = StyleSheet.create({
     backgroundColor: '#4CAF50',
     alignSelf: 'flex-end',
   },
+  strategyPicker: {
+    backgroundColor: '#1A1A24',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#2A2A38',
+    paddingHorizontal: 12,
+    paddingVertical: Platform.OS === 'ios' ? 12 : 9,
+    marginBottom: 4,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  strategyText: { fontSize: 15, color: '#FFFFFF' },
+  strategyPlaceholder: { fontSize: 15, color: '#555577' },
+  strategyArrow: { color: '#555577', fontSize: 12 },
+  strategyDropdown: {
+    backgroundColor: '#1A1A24',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#2A2A38',
+    marginBottom: 12,
+    overflow: 'hidden',
+  },
+  strategyItem: {
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#13131C',
+  },
+  strategyItemText: { fontSize: 14, color: '#FFFFFF' },
+  strategyItemEmpty: { fontSize: 14, color: '#555577' },
+  strategyEmpty: { padding: 14, color: '#555577', fontSize: 13 },   
   });
 
 export default AddTradeScreen

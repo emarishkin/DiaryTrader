@@ -53,6 +53,37 @@ const StatisticsScreen = () => {
         }
     }).filter(c => c.count > 0)
 
+    const strategyStats = (()=>{
+
+        const map:Record<string, {
+            name:string,
+            total:number,
+            wins:number,
+            losses:number,
+            pnl:number,
+            currency:string
+        }> = {}
+
+        closed.forEach(t=>{
+            if(!t.setupName) return
+            if(!map[t.setupName]){
+                map[t.setupName] = {
+                    name:t.setupName,
+                    total:0,
+                    wins:0,
+                    losses:0,
+                    pnl:0,
+                    currency:t.currency
+                }
+            }
+            map[t.setupName].total += 1
+            map[t.setupName].pnl += (t.profit ?? 0)
+            if ((t.profit ?? 0) > 0 ) map[t.setupName].wins += 1
+            else map[t.setupName].losses +=1
+        })
+        return Object.values(map).sort((a,b)=>(b.wins / b.total) - (a.wins / a.total))
+    })()
+
     return(
         <SafeAreaView style={styles.root}>
             <Text style={styles.title}>Аналитика</Text>
@@ -226,6 +257,67 @@ const StatisticsScreen = () => {
                             </View>
                         )}
 
+                        {strategyStats.length > 0 && (
+                            <View style={styles.section}>
+                                <Text style={styles.sectionTitle}>📋 Эффективность стратегий</Text>
+                                <Text style={styles.stratSubtitle}>Отсортировано по винрейту</Text>
+
+                                {strategyStats.map((s,index)=>{
+                                    const winRate = (s.wins / s.total) * 100
+                                    const isPositive = s.pnl >= 0
+                                    const currencySymbol = s.currency === 'RUB' ? '₽' :
+                                        s.currency === 'USD' ? '$' :
+                                        s.currency === 'EUR' ? '€' : s.currency 
+
+                                    return (
+                                        <View key={s.name} style={[styles.stratCard, index === 0 && styles.stratCardBest]}>
+
+                                            <View style={styles.stratCardTop}>
+                                                <View style={styles.stratCardLeft}>
+                                                    {index === 0 && (
+                                                        <Text style={styles.stratBestBadge}>🏆 Лучшая</Text>
+                                                    )}
+                                                    <Text style={styles.stratName}>{s.name}</Text>
+                                                </View>
+                                                <Text style={[styles.stratPnl, isPositive ? styles.green : styles.red]}>
+                                                    {isPositive ? '+' : '-'}{s.pnl.toFixed(0)} {currencySymbol}
+                                                </Text>
+                                            </View>
+
+                                            <View style={styles.stratBarRow}>
+                                                <View style={styles.stratBarTrack}>
+                                                    <View style={[
+                                                        styles.stratBarFill,
+                                                        {
+                                                            width: `${winRate}%`,
+                                                            backgroundColor: winRate >= 50 ? '#2E7D32' : '#C62828'
+                                                        }
+                                                    ]} />
+                                                </View>
+                                                <Text style={[styles.stratWinRate, winRate >= 50 ? styles.green : styles.red]}>
+                                                    {winRate.toFixed(0)}%
+                                                </Text>
+                                            </View>
+
+                                            <View style={styles.stratDetails}>
+                                                <Text style={styles.stratDetail}>
+                                                    📊 {s.total} сделок
+                                                </Text>
+                                                <Text style={styles.stratDetail}>
+                                                    ✅ {s.wins} побед
+                                                </Text>
+                                                <Text style={styles.stratDetail}>
+                                                    ❌ {s.losses} убытков
+                                                </Text>
+                                            </View>
+
+                                        </View>
+                                    )
+                                })}
+
+                            </View>
+                        )}
+
                     </>
                 )}
 
@@ -305,6 +397,82 @@ const StatisticsScreen = () => {
     fontWeight: '700',
     textAlign: 'right',
   },
+  stratSubtitle: {
+  fontSize: 11,
+  color: '#555577',
+  marginBottom: 12,
+  marginTop: -8,
+  },
+  stratCard: {
+    backgroundColor: '#13131C',
+    borderRadius: 14,
+    padding: 14,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#2A2A38',
+  },
+  stratCardBest: {
+    borderColor: '#2E7D32',
+    borderWidth: 1.5,
+  },
+  stratCardTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 10,
+  },
+  stratCardLeft: {
+    flex: 1,
+  },
+  stratBestBadge: {
+    fontSize: 11,
+    color: '#4CAF50',
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  stratName: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    flex: 1,
+  },
+  stratPnl: {
+    fontSize: 16,
+    fontWeight: '800',
+    marginLeft: 8,
+  },
+  stratBarRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 10,
+  },
+  stratBarTrack: {
+    flex: 1,
+    height: 10,
+    backgroundColor: '#1d1d29',
+    borderRadius: 5,
+    overflow: 'hidden',
+  },
+  stratBarFill: {
+    height: '100%',
+    borderRadius: 5,
+  },
+  stratWinRate: {
+    fontSize: 14,
+    fontWeight: '700',
+    width: 40,
+    textAlign: 'right',
+  },
+  stratDetails: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  stratDetail: {
+    fontSize: 12,
+    color: '#555577',
+  },
   });
+  
 
 export default StatisticsScreen
