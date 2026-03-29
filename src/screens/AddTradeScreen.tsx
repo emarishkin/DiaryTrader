@@ -1,10 +1,11 @@
 import { use, useCallback, useState } from "react"
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native"
+import { Alert, Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { calculateRiskReward, generateId, todayString } from "../utils/tradeUtils"
 import { Strategy, Trade } from "../types"
 import { StorageService } from "../storage/storage"
 import { useFocusEffect } from "@react-navigation/native"
+import * as ImagePicker from 'expo-image-picker'
 
 const AddTradeScreen = () => {
 
@@ -26,6 +27,7 @@ const AddTradeScreen = () => {
     const [setupName,setSetupName] = useState('')
     const [strategies, setStrategies] = useState<Strategy[]>([])
     const [showStrategyPicker, setShowStrategyPicker] = useState(false)
+    const [photos,setPhotos] = useState<string[]>([])
     
     useFocusEffect(useCallback(()=>{
         StorageService.getStrategies().then(setStrategies)
@@ -61,6 +63,7 @@ const AddTradeScreen = () => {
         setFollowedPlan(undefined)
         setSetupName('')
         setShowStrategyPicker(false)
+        setPhotos([])
     }
 
     async function handleSave(){
@@ -90,7 +93,8 @@ const AddTradeScreen = () => {
             confidence:confidence || undefined,
             emotion:emotion || undefined,
             followedPlan: followedPlan,
-            setupName:setupName || undefined
+            setupName:setupName || undefined,
+            photos: photos.length > 0 ? photos : undefined
         }
 
         if(hasExit) {
@@ -103,6 +107,28 @@ const AddTradeScreen = () => {
         { text: 'OK', onPress: clearForm },
         ])
 
+    }
+
+    const pickImage = async () => {
+        if(photos.length >= 4){
+            Alert.alert('Максимум', 'Можно прикрепить не более 4 фото')
+            return
+        }
+
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes:ImagePicker.MediaTypeOptions.Images,
+            allowsEditing:false,
+            quality:0.7,
+            allowsMultipleSelection:false
+        })
+
+        if(!result.canceled && result.assets[0]){
+            setPhotos(prev=>[...prev, result.assets[0].uri])
+        }
+    }
+
+    const removePhoto = (index:number) => {
+        setPhotos(prev => prev.filter((_,i)=> i != index))
     }
 
     return(
@@ -254,6 +280,28 @@ const AddTradeScreen = () => {
                         placeholderTextColor="#BDBDBD"
                         multiline
                     />
+
+                    <Text style={styles.fieldLabel}>Скриншоты графика</Text>
+                    <View style={styles.photosRow}>
+                        {photos.map((uri,index)=>(
+                            <View style={styles.photoWrapper} key={index}>
+                                <Image 
+                                    source={{uri}}
+                                    style={styles.photoThumb}
+                                    resizeMode="cover"
+                                />
+                                <TouchableOpacity style={styles.photoRemove} onPress={()=>removePhoto(index)}>
+                                    <Text style={styles.photoRemoveText}>✕</Text>
+                                </TouchableOpacity>
+                            </View>
+                        ))}
+                        {photos.length < 4 && (
+                            <TouchableOpacity style={styles.photoAdd} onPress={pickImage} activeOpacity={0.8}>
+                                <Text style={styles.photoAddIcon}>📷</Text>
+                                <Text style={styles.photoAddText}>Добавить</Text>
+                            </TouchableOpacity>
+                        )}
+                    </View>
 
                     <Text style={styles.fieldLabel}>Стратегия</Text>
                     <TouchableOpacity style={styles.strategyPicker} onPress={()=>setShowStrategyPicker(!showStrategyPicker)} activeOpacity={0.8}>
@@ -456,7 +504,55 @@ const styles = StyleSheet.create({
   },
   strategyItemText: { fontSize: 14, color: '#FFFFFF' },
   strategyItemEmpty: { fontSize: 14, color: '#555577' },
-  strategyEmpty: { padding: 14, color: '#555577', fontSize: 13 },   
+  strategyEmpty: { padding: 14, color: '#555577', fontSize: 13 },  
+  photosRow: {
+  flexDirection: 'row',
+  gap: 10,
+  marginBottom: 12,
+  flexWrap: 'wrap',
+  },
+  photoWrapper: {
+    width: 80,
+    height: 80,
+    borderRadius: 10,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  photoThumb: {
+    width: 80,
+    height: 80,
+    borderRadius: 10,
+  },
+  photoRemove: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  photoRemoveText: {
+    color: '#FFF',
+    fontSize: 10,
+    fontWeight: '700',
+  },
+  photoAdd: {
+    width: 80,
+    height: 80,
+    borderRadius: 10,
+    backgroundColor: '#1A1A24',
+    borderWidth: 1,
+    borderColor: '#2A2A38',
+    borderStyle: 'dashed',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
+  },
+  photoAddIcon: { fontSize: 24 },
+  photoAddText: { fontSize: 11, color: '#555577', fontWeight: '600' },
   });
 
 export default AddTradeScreen

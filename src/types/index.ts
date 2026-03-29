@@ -19,7 +19,8 @@ export interface Trade {
     createdAt:string
     confidence?:'low'|'medium'|'high'
     emotion?:'fear'|'neutral'|'greed'
-    followedPlan?:boolean
+    followedPlan?:boolean,
+    photos?: string[]
 }
 
 export interface Strategy {
