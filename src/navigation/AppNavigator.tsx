@@ -48,6 +48,7 @@ const DashboardStack = () => {
             <Stack.Screen name="DashboardHome" component={DashboardScreen} />
             <Stack.Screen name="TradeHistory" component={TradeHistoryScreen} />
             <Stack.Screen name="TradeDetail" component={TradeDetailScreen} />
+            <Stack.Screen name="EditTrade" component={AddTradeScreen} />
         </Stack.Navigator>
     )
 }

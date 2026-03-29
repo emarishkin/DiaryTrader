@@ -9,7 +9,7 @@ import { Image } from 'react-native';
 
 export const TradeDetailScreen = () => {
 
-    const navigation = useNavigation() 
+    const navigation = useNavigation<any>() 
     const route = useRoute<any>()
     const { tradeId } = route.params
 
@@ -66,9 +66,14 @@ export const TradeDetailScreen = () => {
                     <Text style={styles.backArrow}>←</Text>
                 </TouchableOpacity>
                 <Text style={styles.title}>{trade.symbol}</Text>
-                <TouchableOpacity style={styles.deleteBtn} onPress={handleDelete}>
-                    <Text style={styles.deleteBtnText}>🗑</Text>
-                </TouchableOpacity>
+                <View style={styles.headerActions}>
+                    <TouchableOpacity style={styles.editBtn} onPress={()=>navigation.navigate('EditTrade',{tradeToEdit:trade})} activeOpacity={0.8}>
+                        <Text style={styles.editBtnText}>✏️</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.deleteBtn} onPress={handleDelete}>
+                        <Text style={styles.deleteBtnText}>🗑</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
 
             <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -285,10 +290,23 @@ export const TradeDetailScreen = () => {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: '#1d1d29' },
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: 14, paddingBottom: 10 },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 10,
+  },
   backBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#1A1A24', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#2A2A38' },
   backArrow: { fontSize: 18, color: '#FFFFFF' },
-  title: { fontSize: 22, fontWeight: '700', color: '#FFFFFF' },
+  title: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    flex: 1,
+    textAlign: 'center',
+  },
   deleteBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#2E0D0D', alignItems: 'center', justifyContent: 'center' },
   deleteBtnText: { fontSize: 16 },
   content: { paddingHorizontal: 16 },
@@ -381,5 +399,15 @@ const styles = StyleSheet.create({
   photoFull: {
     width: '100%',
     height: '80%',
+  },
+  editBtn: {
+    width: 36, height: 36, borderRadius: 18,
+    backgroundColor: '#1A2A4A',
+    alignItems: 'center', justifyContent: 'center',
+  },
+  editBtnText: { fontSize: 16 }, 
+  headerActions: {
+  flexDirection: 'row',
+  gap: 8,
   },
 });

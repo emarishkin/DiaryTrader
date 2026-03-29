@@ -1,11 +1,13 @@
-import { use, useCallback, useState } from "react"
+import { use, useCallback, useEffect, useState } from "react"
 import { Alert, Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { calculateRiskReward, generateId, todayString } from "../utils/tradeUtils"
 import { Strategy, Trade } from "../types"
 import { StorageService } from "../storage/storage"
-import { useFocusEffect } from "@react-navigation/native"
+import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native"
 import * as ImagePicker from 'expo-image-picker'
+
+
 
 const AddTradeScreen = () => {
 
@@ -28,6 +30,33 @@ const AddTradeScreen = () => {
     const [strategies, setStrategies] = useState<Strategy[]>([])
     const [showStrategyPicker, setShowStrategyPicker] = useState(false)
     const [photos,setPhotos] = useState<string[]>([])
+
+    const route = useRoute<any>()
+    const navigation = useNavigation<any>();
+    const tradeToEdit:Trade | undefined = route.params?.tradeToEdit
+    const isEdit = !!tradeToEdit
+
+    useEffect(() => {
+        if (tradeToEdit) {
+            setMarket(tradeToEdit.market)
+            setDirection(tradeToEdit.direction)
+            setSymbol(tradeToEdit.symbol)
+            setQuantity(String(tradeToEdit.quantity))
+            setEntryDate(tradeToEdit.entryDate)
+            setEntryPrice(String(tradeToEdit.entryPrice))
+            setStopLoss(tradeToEdit.stopLoss ? String(tradeToEdit.stopLoss) : '')
+            setTakeProfit(tradeToEdit.takeProfit ? String(tradeToEdit.takeProfit) : '')
+            setCurrency(tradeToEdit.currency)
+            setExitDate(tradeToEdit.exitDate ?? '')
+            setExitPrice(tradeToEdit.exitPrice ? String(tradeToEdit.exitPrice) : '')
+            setNotes(tradeToEdit.notes ?? '')
+            setSetupName(tradeToEdit.setupName ?? '')
+            setConfidence(tradeToEdit.confidence)
+            setEmotion(tradeToEdit.emotion)
+            setFollowedPlan(tradeToEdit.followedPlan)
+            setPhotos(tradeToEdit.photos ?? [])
+        }
+    }, [tradeToEdit])
     
     useFocusEffect(useCallback(()=>{
         StorageService.getStrategies().then(setStrategies)
@@ -75,7 +104,7 @@ const AddTradeScreen = () => {
         const hasExit = exitPrice && !isNaN(parseFloat(exitPrice))
 
         const trade:Trade = {
-            id:generateId(),
+            id:tradeToEdit?.id ?? generateId(),
             market,
             direction,
             symbol:symbol.trim().toUpperCase(),
@@ -89,7 +118,7 @@ const AddTradeScreen = () => {
             exitPrice:hasExit ? parseFloat(exitPrice) : undefined,
             notes:notes || undefined,
             status:hasExit ? 'close' : 'open',
-            createdAt: new Date().toISOString(),
+            createdAt: tradeToEdit?.createdAt ?? new Date().toISOString(),
             confidence:confidence || undefined,
             emotion:emotion || undefined,
             followedPlan: followedPlan,
@@ -103,10 +132,16 @@ const AddTradeScreen = () => {
         }
 
         await StorageService.saveTrade(trade)
-        Alert.alert('✅ Сохранено', `Сделка ${trade.symbol} сохранена`, [
-        { text: 'OK', onPress: clearForm },
-        ])
 
+        if(isEdit){
+            Alert.alert('✅ Обновлено', `Сделка ${trade.symbol} обновлена`, [
+                { text: 'OK', onPress: () => navigation.goBack() },
+            ])
+        } else {
+            Alert.alert('✅ Сохранено', `Сделка ${trade.symbol} сохранена`, [
+                { text: 'OK', onPress: clearForm },
+            ])
+        }
     }
 
     const pickImage = async () => {
@@ -134,7 +169,7 @@ const AddTradeScreen = () => {
     return(
         <SafeAreaView style={styles.root}>
             <KeyboardAvoidingView style={{flex:1}} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-                <Text style={styles.title}>Добавить сделку</Text>
+                <Text style={styles.title}>{isEdit ? 'Редактировать сделку' : 'Добавить сделку'}</Text>
                 <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps='handled' showsVerticalScrollIndicator={false}>
 
                     <Text style={styles.groupLabel}>Тип Рынка</Text>
@@ -374,7 +409,7 @@ const AddTradeScreen = () => {
                             <Text style={styles.clearBtnText}>Очистить</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.saveBtn} onPress={()=>{handleSave()}}>
-                            <Text style={styles.saveBtnText}>Сохранить сделку</Text>
+                            <Text style={styles.saveBtnText}>{isEdit ? 'Сохранить изменения' : 'Сохранить сделку'}</Text>
                         </TouchableOpacity>
                     </View>
 
