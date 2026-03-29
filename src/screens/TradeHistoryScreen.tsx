@@ -10,6 +10,7 @@ import { formatMoney } from '../utils/tradeUtils';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 type Filter = 'all' | 'open' | 'closed' | 'long' | 'short';
+type SortBy = 'date_new' | 'date_old' | 'profit_high' | 'profit_low';
 
 const FILTERS: { label: string; value: Filter }[] = [
   { label: 'Все', value: 'all' },
@@ -26,6 +27,8 @@ const TradeHistoryScreen = () => {
   const [trades, setTrades] = useState<Trade[]>([]);
   const [filter, setFilter] = useState<Filter>('all');
   const [search, setSearch] = useState('');
+  const [sortBy, setSortBy] = useState<SortBy>('date_new')
+  const [showSortMenu,setShowSortMenu] = useState(false)
 
   useFocusEffect(useCallback(() => {
     StorageService.getTrades().then(setTrades);
@@ -47,14 +50,59 @@ const TradeHistoryScreen = () => {
   const totalPnL = filtered
     .filter(t => t.status === 'close')
     .reduce((s, t) => s + (t.profit ?? 0), 0);
+  
+  const sorted = [...filtered].sort((a,b)=>{
+    switch(sortBy){
+      case 'date_new':
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      case 'date_old':
+        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      case 'profit_high':
+        return (b.profit ?? 0) - (a.profit ?? 0)
+      case 'profit_low':
+        return (a.profit ?? 0) - (b.profit ?? 0)
+    }
+  })
 
   return (
     <SafeAreaView style={styles.root}>
 
       <View style={styles.header}>
-        <Text style={styles.title}>История сделок</Text>
-        <Text style={styles.subtitle}>{trades.length} сделок</Text>
+        <View>
+          <Text style={styles.title}>История сделок</Text>
+          <Text style={styles.subtitle}>{trades.length} сделок</Text>
+        </View>
+        <TouchableOpacity style={styles.sortBtn} onPress={()=>setShowSortMenu(!showSortMenu)} activeOpacity={0.8}>
+          <Text style={styles.sortBtnText}>⇅ Сортировка</Text>
+        </TouchableOpacity>
       </View>
+
+      {showSortMenu && (
+        <View style={styles.sortMenu}>
+          {([
+            { label: '📅 Сначала новые', value: 'date_new' },
+            { label: '📅 Сначала старые', value: 'date_old' },
+            { label: '💰 Сначала прибыльные', value: 'profit_high' },
+            { label: '💸 Сначала убыточные', value: 'profit_low' },
+          ] as const).map(opt => (
+            <TouchableOpacity 
+              key={opt.value} 
+              style={[
+                styles.sortItem,
+                sortBy === opt.value && styles.sortItemActive
+              ]}
+              onPress={()=>{setSortBy(opt.value),setShowSortMenu(false)}}
+            >
+              <Text style={[styles.sortItemText, sortBy === opt.value && styles.sortItemTextActive]}>
+                {opt.label}
+              </Text>  
+              {sortBy === opt.value && (
+                <Text style={styles.sortCheck}>✓</Text>
+              )}
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
 
       <View style={styles.searchBox}>
         <Text style={styles.searchIcon}>🔍</Text>
@@ -96,7 +144,7 @@ const TradeHistoryScreen = () => {
       )}
 
       <FlatList
-        data={filtered}
+        data={sorted}
         keyExtractor={item => item.id}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
@@ -171,6 +219,54 @@ const styles = StyleSheet.create({
   empty: { paddingVertical: 60, alignItems: 'center' },
   emptyIcon: { fontSize: 40, marginBottom: 12 },
   emptyText: { fontSize: 16, fontWeight: '600', color: '#FFFFFF' },
+  sortBtn: {
+  backgroundColor: '#1A1A24',
+  paddingHorizontal: 12,
+  paddingVertical: 8,
+  borderRadius: 20,
+  borderWidth: 1,
+  borderColor: '#2A2A38',
+  },
+  sortBtnText: {
+    fontSize: 12,
+    color: '#AAAACC',
+    fontWeight: '600',
+  },
+  sortMenu: {
+    backgroundColor: '#1A1A24',
+    borderRadius: 14,
+    marginHorizontal: 16,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#2A2A38',
+    overflow: 'hidden',
+  },
+  sortItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 13,
+    borderBottomWidth: 1,
+    borderBottomColor: '#13131C',
+  },
+  sortItemActive: {
+    backgroundColor: '#13131C',
+  },
+  sortItemText: {
+    fontSize: 14,
+    color: '#AAAACC',
+  },
+  sortItemTextActive: {
+    color: '#2979FF',
+    fontWeight: '600',
+  },
+  sortCheck: {
+    fontSize: 14,
+    color: '#2979FF',
+    fontWeight: '700',
+  },
+
 });
 
 export default TradeHistoryScreen;
