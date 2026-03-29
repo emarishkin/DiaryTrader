@@ -5,6 +5,7 @@ import { Trade } from "../types";
 import { calculateProfit, formatMoney, todayString } from "../utils/tradeUtils";
 import { StorageService } from "../storage/storage";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Image } from 'react-native';
 
 export const TradeDetailScreen = () => {
 
@@ -16,6 +17,7 @@ export const TradeDetailScreen = () => {
     const [closeModal,setCloseModal] = useState(false)
     const [exitPrice,setExitPrice] = useState('')
     const [exitDate,setExitDate] = useState(todayString())
+    const [selectedPhoto,setSelectedPhoto] = useState<string | null>(null)
 
     useFocusEffect(useCallback(()=>{
         StorageService.getTradeById(tradeId).then(setTrade)
@@ -145,6 +147,23 @@ export const TradeDetailScreen = () => {
                     </View>
                 )}
 
+                {trade.photos && trade.photos.length > 0 && (
+                    <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>📷 Скриншоты графика</Text>
+                        <View style={styles.photosRow}>
+                            {trade.photos.map((uri,index)=>(
+                                <TouchableOpacity key={index} onPress={()=>setSelectedPhoto(uri)} activeOpacity={0.85}>
+                                    <Image 
+                                        source={{uri}}
+                                        style={styles.photoThumb}
+                                        resizeMode="cover"
+                                    />
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+                    </View>
+                )}
+
                 {(trade.confidence || trade.emotion || trade.followedPlan !== undefined) && (
                     <View style={styles.section}>
                         <Text style={styles.sectionTitle}>🧠 Психология сделки</Text>
@@ -245,6 +264,21 @@ export const TradeDetailScreen = () => {
                 </View>
             </Modal>
 
+            <Modal visible={selectedPhoto !== null} transparent animationType="fade" onRequestClose={()=>setSelectedPhoto(null)}>
+                <View style={styles.photoModal}>
+                    <TouchableOpacity style={styles.photoModalClose} onPress={()=>setSelectedPhoto(null)}>
+                        <Text style={styles.photoModalCloseText}>✕</Text>
+                    </TouchableOpacity>
+                    {selectedPhoto && (
+                        <Image 
+                            source={{uri: selectedPhoto}}
+                            style={styles.photoFull}
+                            resizeMode="contain"
+                        />
+                    )}
+                </View>
+            </Modal>
+
         </SafeAreaView>
     )
 }
@@ -309,4 +343,43 @@ const styles = StyleSheet.create({
   psychFear: { backgroundColor: '#C62828' },
   psychNeutral: { backgroundColor: '#1565C0' },
   psychGreed: { backgroundColor: '#6A1B9A' },
+  photosRow: {
+  flexDirection: 'row',
+  gap: 10,
+  flexWrap: 'wrap',
+  },
+  photoThumb: {
+    width: 80,
+    height: 80,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#2A2A38',
+  },
+  photoModal: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.95)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  photoModalClose: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 10,
+  },
+  photoModalCloseText: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  photoFull: {
+    width: '100%',
+    height: '80%',
+  },
 });
