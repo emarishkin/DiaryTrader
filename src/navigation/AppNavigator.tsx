@@ -9,6 +9,7 @@ import TradeHistoryScreen from "../screens/TradeHistoryScreen";
 import { StrategiesScreen  } from "../screens/StrategiesScreen";
 import { TradeDetailScreen } from "../screens/TradeDetailScreen";
 import { StrategyDetailScreen } from "../screens/StrategyDetailScreen";
+import { SettingsScreen } from "../screens/SettingsScreen";
 
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator()
@@ -17,6 +18,7 @@ const icons = {
   dashboard: require('../../assets/HouseDashboardScreenLogo.png'),
   add: require('../../assets/PlusLogoAddTrades.png'),
   statistics: require('../../assets/statisticsLogo.png'),
+  setting: require('../../assets/settingsLogo.png')
 };
 
 function TabIcon({source,focused,isAdd}:{source:any,focused:boolean,isAdd?:boolean}){
@@ -96,6 +98,16 @@ export const AppNavigator = () => {
                 options={{
                     tabBarIcon:({focused}) => (
                         <TabIcon source={icons.statistics} focused={focused} />
+                    )
+                }}
+            />
+
+            <Tab.Screen 
+                name="Settings"
+                component={SettingsScreen}
+                options={{
+                    tabBarIcon:({focused}) => (
+                        <TabIcon source={icons.setting} focused={focused} />
                     )
                 }}
             />
