@@ -31,4 +31,6 @@ export interface Strategy {
     timeframe:string
     market:string
     createdAt:string
+    photos?:string[]
+    localImages?: number[]  
 }

@@ -122,7 +122,7 @@ const DashboardScreen = () => {
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.strategiesBtn} activeOpacity={0.8} onPress={()=>navigation.navigate('Strategies')}>
-                    <Text style={styles.historyBtnLeft}>📋  Мои стратегии</Text>
+                    <Text style={styles.historyBtnLeft}>🏹  Мои стратегии</Text>
                     <Text style={styles.historyBtnRight}>→</Text>
                 </TouchableOpacity>
                 

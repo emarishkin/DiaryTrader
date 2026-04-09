@@ -1,10 +1,11 @@
 import { useCallback, useState } from "react";
-import { Alert, FlatList, Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native"
+import { Alert, FlatList, Image, Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native"
 import { Strategy } from "../types";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { StorageService } from "../storage/storage";
 import { generateId } from "../utils/tradeUtils";
 import { SafeAreaView } from "react-native-safe-area-context";
+import * as ImagePicker from 'expo-image-picker'
 
 export const StrategiesScreen = () => {
 
@@ -18,6 +19,7 @@ export const StrategiesScreen = () => {
     const [rules, setRules] = useState('')
     const [timeframe, setTimeframe] = useState('')
     const [market, setMarket] = useState('')
+    const [photos,setPhotos] = useState<string[]>([])
 
     useFocusEffect(useCallback(()=>{
       StorageService.getStrategies().then(setStrategies)
@@ -29,6 +31,7 @@ export const StrategiesScreen = () => {
         setRules('')
         setTimeframe('')
         setMarket('')
+        setPhotos([])
     }
 
     async function handleSave() {
@@ -42,6 +45,7 @@ export const StrategiesScreen = () => {
             timeframe: timeframe.trim(),
             market: market.trim(),
             createdAt: new Date().toISOString(),
+            photos: photos.length > 0 ? photos : undefined
         }
 
         await StorageService.saveStrategy(strategy)
@@ -60,6 +64,20 @@ export const StrategiesScreen = () => {
                 }}
             ]
         )
+    }
+
+    const pickPhoto = async () => {
+        if(photos.length >= 4){
+            Alert.alert('Максимум', 'Можно прикрепить не более 4 фото')
+            return
+        }
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes:ImagePicker.MediaTypeOptions.Images,
+            quality:0.7,
+        })
+        if(!result.canceled && result.assets[0]){
+            setPhotos(prev => [...prev,result.assets[0].uri])
+        }
     }
 
     return (
@@ -175,6 +193,24 @@ export const StrategiesScreen = () => {
                                 </View>
                             </View>
 
+                            <Text style={styles.fieldLabel}>Фото / Схемы стратегии</Text>
+                            <View style={styles.photosRow}>
+                                {photos.map((uri,index)=>(
+                                    <View style={styles.photoWrapper} key={index}>
+                                        <Image source={{uri}} style={styles.photoThumb} resizeMode="cover" />
+                                        <TouchableOpacity style={styles.photoRemove} onPress={() => setPhotos(prev => prev.filter((_,i) => i !== index))}>
+                                            <Text style={styles.photoRemoveText}>✕</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                ))}
+                                {photos.length < 4 && (
+                                    <TouchableOpacity style={styles.photoAdd} onPress={pickPhoto}>
+                                        <Text style={styles.photoAddIcon}>📷</Text>
+                                        <Text style={styles.photoAddText}>Добавить</Text>
+                                    </TouchableOpacity>
+                                )}
+                            </View>
+
                             <View style={styles.modalBtns}>
                                 <TouchableOpacity style={styles.cancelBtn} onPress={()=>{clearForm();setModalVisible(false)}}>
                                     <Text style={styles.cancelBtnText}>Отмена</Text>
@@ -228,4 +264,12 @@ const styles = StyleSheet.create({
   cancelBtnText: { fontSize: 15, fontWeight: '600', color: '#555577' },
   saveBtn: { flex: 1, backgroundColor: '#2979FF', borderRadius: 12, paddingVertical: 14, alignItems: 'center' },
   saveBtnText: { fontSize: 15, fontWeight: '700', color: '#FFF' },
+  photosRow: { flexDirection: 'row', gap: 10, marginBottom: 12, flexWrap: 'wrap' },
+  photoWrapper: { width: 72, height: 72, borderRadius: 10, overflow: 'hidden', position: 'relative' },
+  photoThumb: { width: 72, height: 72, borderRadius: 10 },
+  photoRemove: { position: 'absolute', top: 3, right: 3, width: 18, height: 18, borderRadius: 9, backgroundColor: 'rgba(0,0,0,0.6)', alignItems: 'center', justifyContent: 'center' },
+  photoRemoveText: { color: '#FFF', fontSize: 9, fontWeight: '700' },
+  photoAdd: { width: 72, height: 72, borderRadius: 10, backgroundColor: '#13131C', borderWidth: 1, borderColor: '#2A2A38', alignItems: 'center', justifyContent: 'center', gap: 4 },
+  photoAddIcon: { fontSize: 20 },
+  photoAddText: { fontSize: 10, color: '#555577', fontWeight: '600' },
 });
