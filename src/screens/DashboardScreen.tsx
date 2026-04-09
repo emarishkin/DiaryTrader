@@ -120,6 +120,11 @@ const DashboardScreen = () => {
                     <Text style={styles.historyBtnLeft}>📋  История сделок</Text>
                     <Text style={styles.historyBtnRight}>{trades.length} сделок  →</Text>
                 </TouchableOpacity>
+
+                <TouchableOpacity style={styles.strategiesBtn} activeOpacity={0.8} onPress={()=>navigation.navigate('Strategies')}>
+                    <Text style={styles.historyBtnLeft}>📋  Мои стратегии</Text>
+                    <Text style={styles.historyBtnRight}>→</Text>
+                </TouchableOpacity>
                 
                 <View style={{ height: 100 }} />
 
@@ -173,6 +178,11 @@ const styles = StyleSheet.create({
   historyBtn: { backgroundColor: '#1A1A24', borderRadius: 14, paddingVertical: 16, paddingHorizontal: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 6, borderWidth: 1, borderColor: '#2A2A38' },
   historyBtnLeft: { fontSize: 15, fontWeight: '600', color: '#FFFFFF' },
   historyBtnRight: { fontSize: 13, color: '#2979FF', fontWeight: '500' },
+  strategiesBtn: { 
+  backgroundColor: '#1A1A24', borderRadius: 14, paddingVertical: 16, 
+  paddingHorizontal: 16, flexDirection: 'row', justifyContent: 'space-between', 
+  alignItems: 'center', marginTop: 10, borderWidth: 1, borderColor: '#2A2A38' 
+  },
 });
 
 export default DashboardScreen

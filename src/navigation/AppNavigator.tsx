@@ -51,6 +51,8 @@ const DashboardStack = () => {
             <Stack.Screen name="TradeHistory" component={TradeHistoryScreen} />
             <Stack.Screen name="TradeDetail" component={TradeDetailScreen} />
             <Stack.Screen name="EditTrade" component={AddTradeScreen} />
+            <Stack.Screen name="Strategies" component={StrategiesScreen} />
+            <Stack.Screen name="StrategyDetail" component={StrategyDetailScreen} />
         </Stack.Navigator>
     )
 }
@@ -59,8 +61,6 @@ const StatisticsStack = () => {
     return (
         <Stack.Navigator screenOptions={{headerShown:false}}>
             <Stack.Screen name="StatisticsHome" component={StatisticsScreen} />
-            <Stack.Screen name="Strategies" component={StrategiesScreen} />
-            <Stack.Screen name="StrategyDetail" component={StrategyDetailScreen} />
         </Stack.Navigator>
     )
 }

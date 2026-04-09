@@ -33,9 +33,9 @@ const StatisticsScreen = () => {
     ? (followedWithPlan.length / closedWithPlan.length) * 100 
     : 0
 
-    const emotionStats = (['fear', 'nautral', 'greed'] as const).map(emotion => {
+    const emotionStats = (['fear', 'neutral', 'greed'] as const).map(emotion => {
         const trades = closed.filter(t => t.emotion === emotion)
-        const wins = closed.filter(t=>(t.profit ?? 0)>0)
+        const wins = trades.filter(t=>(t.profit ?? 0)>0)
         return {
             emotion,
             count: trades.length,
@@ -45,7 +45,7 @@ const StatisticsScreen = () => {
 
     const confidenceStats = (['low', 'medium', 'high'] as const).map(conf => {
         const trades = closed.filter(t => t.confidence === conf)
-        const wins = closed.filter(t=>(t.profit ?? 0)>0)
+        const wins = trades.filter(t=>(t.profit ?? 0)>0)
         return {
             confidence: conf,
             count: trades.length,
@@ -195,7 +195,7 @@ const StatisticsScreen = () => {
                                                 <Text style={styles.psychLabel}>
                                                     {
                                                         e.emotion === 'fear' ? '😨 Страх' :
-                                                        e.emotion === 'nautral' ? '😐 Нейтрально' :
+                                                        e.emotion === 'neutral' ? '😐 Нейтрально' :
                                                         '🤑 Жадность'
                                                     }
                                                 </Text>
@@ -207,7 +207,7 @@ const StatisticsScreen = () => {
                                                                 width: `${e.winRate}%`,
                                                                 backgroundColor:
                                                                     e.emotion === 'fear' ? '#C62828' :
-                                                                    e.emotion === 'nautral' ? '#1565C0' :
+                                                                    e.emotion === 'neutral' ? '#1565C0' :
                                                                     '#6A1B9A'
                                                             }
                                                         ]}
@@ -320,10 +320,6 @@ const StatisticsScreen = () => {
 
                     </>
                 )}
-
-                <TouchableOpacity style={styles.strategiesBtn} onPress={()=>navigation.navigate('Strategies')} activeOpacity={0.8}>
-                    <Text style={styles.strategiesBtnLeft}>📋  Мои стратегии</Text>
-                </TouchableOpacity>
 
                 <View style={{ height: 100 }} />
             </ScrollView>
