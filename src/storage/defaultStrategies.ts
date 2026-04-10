@@ -30,10 +30,6 @@ export const DEFAULT_STRATEGIES:Strategy[] = [
             '   - вход основан на ощущениях, а не на правилах.\n',
         timeframe: 'H1 (вход), D1 (контекст)',
         market: 'Крипто, Форекс, Акции',
-        createdAt: new Date().toISOString(),
-        localImages: [
-            require('../../assets/StrategiesPhoto1D.png'),
-            require('../../assets/StrategiesPhoto1H.png')
-        ],        
+        createdAt: new Date().toISOString(),       
   }
 ]

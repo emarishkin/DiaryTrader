@@ -2,6 +2,7 @@ import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { useState } from "react"
 import { Image, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
+import { STRATEGY_IMAGES } from "../storage/strategyImages"
  
 
 
@@ -37,6 +38,8 @@ export const StrategyDetailScreen = () => {
         isSubItem: r.startsWith('   ') || r.startsWith('\t') || r.trim().startsWith('-')
     }))
 
+    const localImages = STRATEGY_IMAGES[strategy.name] ?? []
+
     return(
         <SafeAreaView style={styles.root}>
             
@@ -62,17 +65,16 @@ export const StrategyDetailScreen = () => {
                     )}
                 </View>
 
-                {((strategy.photos && strategy.photos.length > 0) || 
-                  (strategy.localImages && strategy.localImages.length > 0)) && (
+                {(strategy.photos?.length > 0 || localImages.length > 0) && (
                   <View style={styles.section}>
                     <Text style={styles.sectionTitle}>📷 Схемы стратегии</Text>
                     <View style={styles.photosRow}>               
-                      {strategy.photos && strategy.photos.map((uri, index) => (
+                      {strategy.photos?.map((uri, index) => (
                         <TouchableOpacity key={`photo-${index}`} onPress={() => setSelectedPhoto(uri)}>
                           <Image source={{ uri }} style={styles.photoThumb} resizeMode="cover" />
                         </TouchableOpacity>
                       ))}
-                      {strategy.localImages && strategy.localImages.map((img, index) => (
+                      {localImages.map((img, index) => (
                         <TouchableOpacity key={`local-${index}`} onPress={() => setSelectedPhoto(img)}>
                           <Image source={img} style={styles.photoThumb} resizeMode="cover" />
                         </TouchableOpacity>

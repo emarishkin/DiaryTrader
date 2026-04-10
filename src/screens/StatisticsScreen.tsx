@@ -389,7 +389,7 @@ const StatisticsScreen = () => {
   },
   psychPercent: {
     width: 36,
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '700',
     textAlign: 'right',
   },
@@ -455,7 +455,7 @@ const StatisticsScreen = () => {
     borderRadius: 5,
   },
   stratWinRate: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '700',
     width: 40,
     textAlign: 'right',
