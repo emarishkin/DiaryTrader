@@ -95,10 +95,14 @@ const AddTradeScreen = () => {
         setPhotos([])
     }
 
+    const parsePrice = (value: string): number => {
+        return parseFloat(value.replace(',', '.'))
+    }
+
     async function handleSave(){
 
         if(!symbol.trim()) return Alert.alert('Ошибка', 'Введите символ')
-        if(!entryPrice) return Alert.alert('Ошибка', 'Введите цену входа')
+        if(!entryPrice || isNaN(parsePrice(entryPrice))) return Alert.alert('Ошибка', 'Введите цену входа')
         if(!quantity) return Alert.alert('Ошибка', 'Введите количество')
 
         const hasExit = exitPrice && !isNaN(parseFloat(exitPrice))
@@ -108,14 +112,14 @@ const AddTradeScreen = () => {
             market,
             direction,
             symbol:symbol.trim().toUpperCase(),
-            quantity:parseFloat(quantity),
+            quantity:parsePrice(quantity),
             entryDate,
-            entryPrice:parseFloat(entryPrice),
-            stopLoss:stopLoss ? parseFloat(stopLoss) : undefined,
-            takeProfit:takeProfit ? parseFloat(takeProfit) : undefined,
+            entryPrice:parsePrice(entryPrice),
+            stopLoss:stopLoss ? parsePrice(stopLoss) : undefined,
+            takeProfit:takeProfit ? parsePrice(takeProfit) : undefined,
             currency,
             exitDate:exitDate || undefined,
-            exitPrice:hasExit ? parseFloat(exitPrice) : undefined,
+            exitPrice:hasExit ? parsePrice(exitPrice) : undefined,
             notes:notes || undefined,
             status:hasExit ? 'close' : 'open',
             createdAt: tradeToEdit?.createdAt ?? new Date().toISOString(),

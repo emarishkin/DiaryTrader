@@ -107,22 +107,22 @@ export const TradeDetailScreen = () => {
                     </View>
                     <View style={styles.infoRow}>
                         <Text style={styles.infoLabel}>Цена входа</Text>
-                        <Text style={styles.infoValue}>{trade.entryPrice}</Text>
+                        <Text style={styles.infoValue}>{trade.entryPrice.toLocaleString('ru-RU', { maximumFractionDigits: 8 })}</Text>
                     </View>
                     <View style={styles.infoRow}>
                         <Text style={styles.infoLabel}>Количество</Text>
-                        <Text style={styles.infoValue}>{trade.quantity}</Text>
+                        <Text style={styles.infoValue}>{trade.quantity.toLocaleString('ru-RU', { maximumFractionDigits: 8 })}</Text>
                     </View>
                     {trade.stopLoss && (
                         <View style={styles.infoRow}>
                             <Text style={styles.infoLabel}>Стоп-лосс</Text>
-                            <Text style={styles.infoValue}>{trade.stopLoss}</Text>
+                            <Text style={styles.infoValue}>{trade.stopLoss?.toLocaleString('ru-RU', { maximumFractionDigits: 8 })}</Text>
                         </View>
                     )}
                     {trade.takeProfit && (
                         <View style={styles.infoRow}>
                             <Text style={styles.infoLabel}>Тейк-профит</Text>
-                            <Text style={styles.infoValue}>{trade.takeProfit}</Text>
+                            <Text style={styles.infoValue}>{trade.takeProfit?.toLocaleString('ru-RU', { maximumFractionDigits: 8 })}</Text>
                         </View>
                     )}
                 </View>
@@ -139,7 +139,7 @@ export const TradeDetailScreen = () => {
                         {trade.exitPrice && (
                             <View style={styles.infoRow}>
                                 <Text style={styles.infoLabel}>Цена выхода</Text>
-                                <Text style={styles.infoValue}>{trade.exitPrice}</Text>
+                                <Text style={styles.infoValue}>{trade.exitPrice?.toLocaleString('ru-RU', { maximumFractionDigits: 8 })}</Text>
                             </View>
                         )}
                     </View>

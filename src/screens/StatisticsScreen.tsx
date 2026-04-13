@@ -139,13 +139,13 @@ const StatisticsScreen = () => {
                             <View style={styles.infoRow}>
                                 <Text style={styles.infoLabel}>Средняя прибыль</Text>
                                 <Text style={[styles.infoValue, styles.green]}>
-                                    +{avgWin.toFixed(0)} ₽
+                                    {formatMoney(avgWin, wins[0]?.currency ?? 'RUB')}
                                 </Text>
                             </View>
                             <View style={styles.infoRow}>
                                 <Text style={styles.infoLabel}>Средний убыток</Text>
                                 <Text style={[styles.infoValue, styles.red]}>
-                                    -{avgLoss.toFixed(0)} ₽
+                                    {formatMoney(-avgLoss, losses[0]?.currency ?? 'USDT')}
                                 </Text>
                             </View>
                         </View>
@@ -280,7 +280,7 @@ const StatisticsScreen = () => {
                                                     <Text style={styles.stratName}>{s.name}</Text>
                                                 </View>
                                                 <Text style={[styles.stratPnl, isPositive ? styles.green : styles.red]}>
-                                                    {isPositive ? '+' : '-'}{s.pnl.toFixed(0)} {currencySymbol}
+                                                    {isPositive ? '+' : ''}{s.pnl.toLocaleString('ru-RU', { maximumFractionDigits: 2 })} {currencySymbol}
                                                 </Text>
                                             </View>
 

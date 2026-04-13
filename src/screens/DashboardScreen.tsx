@@ -51,7 +51,7 @@ const DashboardScreen = () => {
                 </View>
 
                 <View style={styles.searchBox}>
-                    <Text style={styles.searchIcon}>🔍</Text>
+                     <Text style={styles.searchIcon}>🔍</Text>
                     <TextInput
                         style={styles.searchInput}
                         placeholder='Поиск открытых сделок...'
@@ -78,7 +78,7 @@ const DashboardScreen = () => {
                         <Text style={styles.statLabel}>Всего сделок</Text>
                     </View>
                     <View style={[styles.statCard, netPnL > 0 && styles.statGreen, netPnL < 0 && styles.statRed]}>
-                        <Text style={[styles.statVal, netPnL > 0 && styles.green, netPnL < 0 && styles.red]}>{netPnL === 0 ? '0 USDT' : formatMoney(netPnL)}</Text>
+                        <Text style={[styles.statVal, netPnL > 0 && styles.green, netPnL < 0 && styles.red]}>{netPnL === 0 ? '0 USDT' : formatMoney(netPnL, closeTrades[0]?.currency)}</Text>
                         <Text style={styles.statLabel}>Чистый P&L</Text>
                     </View>
                 </View>
