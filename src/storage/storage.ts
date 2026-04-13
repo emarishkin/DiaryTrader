@@ -1,9 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage"
-import { Strategy, Trade } from "../types";
-import { act } from "react";
+import { Balance, Strategy, Trade, Transaction } from "../types";
 
 const TRADES_KEY = '@trader_diary:trades';
 const STRATEGIES_KEY = '@trader_diary:strategies';
+const BALANCE_KEY = '@trader_diary:balance'
+const TRANSACTIONS_KEY = '@trader_diary:transactions'
 
 export const StorageService = {
     
@@ -70,5 +71,39 @@ export const StorageService = {
                 await this.saveStrategy(strategy)
             }
         }
+    },
+
+    async getBalance():Promise<Balance | null>{
+        try{
+            const raw = await AsyncStorage.getItem(BALANCE_KEY)
+            return raw ? JSON.parse(raw) : null
+        } catch {
+            return null
+        }
+    },
+
+    async saveBalance(balance:Balance):Promise<void>{
+        await AsyncStorage.setItem(BALANCE_KEY, JSON.stringify(balance))
+    },
+
+    async getTransactions():Promise<Transaction[]>{
+        try{
+            const raw = await AsyncStorage.getItem(TRANSACTIONS_KEY)
+            return raw ? JSON.parse(raw) : []
+        } catch {
+            return []
+        }
+    },
+
+    async saveTransaction(transaction:Transaction):Promise<void>{
+        const transactions = await this.getTransactions()
+        transactions.unshift(transaction)
+        await AsyncStorage.setItem(TRANSACTIONS_KEY, JSON.stringify(transactions))
+    },
+
+    async deleteTransaction(id:string):Promise<void>{
+        const transactions = await this.getTransactions()
+        await AsyncStorage.setItem(TRANSACTIONS_KEY, JSON.stringify(transactions.filter(t => t.id !== id)))
     }
+
 }

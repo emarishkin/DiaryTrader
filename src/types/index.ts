@@ -34,3 +34,21 @@ export interface Strategy {
     photos?:string[]
     localImages?: number[]  
 }
+
+export interface Balance {
+    id:string
+    currency:string
+    initialAmount:number
+    createdAt:string
+}
+
+export interface Transaction {
+    id:string
+    type:'deposit' | 'withdrawal' | 'trade_profit' | 'trade_loss'
+    amount:number
+    currency:string
+    date:string
+    tradeId?:string
+    note?:string
+    createdAt:string
+}

@@ -56,15 +56,15 @@ const AddTradeScreen = () => {
             setFollowedPlan(tradeToEdit.followedPlan)
             setPhotos(tradeToEdit.photos ?? [])
         }
-    }, [tradeToEdit])
+    }, [tradeToEdit]) 
     
     useFocusEffect(useCallback(()=>{
         StorageService.getStrategies().then(setStrategies)
     },[]))
 
-    const ep = parseFloat(entryPrice)
-    const sl = parseFloat(stopLoss)
-    const tp = parseFloat(takeProfit)
+    const ep = parseFloat(entryPrice.replace(',', '.'))
+    const sl = parseFloat(stopLoss.replace(',', '.'))
+    const tp = parseFloat(takeProfit.replace(',', '.'))
 
     const rrDisplay = !isNaN(ep) && !isNaN(sl) && !isNaN(tp) ? calculateRiskReward(ep,sl,tp,direction) : '—'
 
