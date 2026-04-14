@@ -1,8 +1,8 @@
 import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
 import { useCallback, useState } from "react";
 import { Alert, Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native"
-import { Trade } from "../types";
-import { calculateProfit, formatMoney, todayString } from "../utils/tradeUtils";
+import { Trade, Transaction } from "../types";
+import { calculateProfit, formatMoney, generateId, todayString } from "../utils/tradeUtils";
 import { StorageService } from "../storage/storage";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from 'react-native';
@@ -41,14 +41,14 @@ export const TradeDetailScreen = () => {
 
     async function handleClose() {
         
-        if(!exitPrice || isNaN(parseFloat(exitPrice))){
+        if(!exitPrice || isNaN(parseFloat(exitPrice.replace(',', '.')))){
             Alert.alert('Ошибка', 'Введите цену выхода')
             return
         }
         
         const updated: Trade = {
             ...trade!,
-            exitPrice: parseFloat(exitPrice),
+            exitPrice: parseFloat(exitPrice.replace(',', '.')),
             exitDate,
             status:'close'
         }
@@ -56,6 +56,25 @@ export const TradeDetailScreen = () => {
         await StorageService.saveTrade(updated)
         setTrade(updated)
         setCloseModal(false)
+
+        const profit = updated.profit ?? 0
+        if(profit !== 0){
+            const balance = await StorageService.getBalance()
+            if(balance){
+                const transaction: Transaction = {
+                    id:generateId(),
+                    type:profit > 0 ? 'trade_profit':'trade_loss',
+                    amount:Math.abs(profit),
+                    currency:updated.currency,
+                    date:exitDate,
+                    tradeId:updated.id,
+                    note:`${updated.direction === 'long' ? 'Лонг' : 'Шорт'} ${updated.symbol}`,
+                    createdAt:new Date().toISOString()
+                }
+                await StorageService.saveTransaction(transaction)
+            }
+        }
+
         Alert.alert('✅ Закрыта', `Результат: ${formatMoney(updated.profit!, updated.currency)}`)
     }
 

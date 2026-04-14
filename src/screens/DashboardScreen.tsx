@@ -45,9 +45,9 @@ const DashboardScreen = () => {
                         <Text style={styles.greeting}>Дневник трейдера 📒</Text>
                         <Text style={styles.title}>Главная страница</Text>
                     </View>
-                    <View style={styles.avatar}>
+                    <TouchableOpacity style={styles.avatar} onPress={()=>navigation.navigate('Balance')} activeOpacity={0.8}>
                         <Text style={styles.avatarText}>M</Text>
-                    </View>
+                    </TouchableOpacity>
                 </View>
 
                 <View style={styles.searchBox}>

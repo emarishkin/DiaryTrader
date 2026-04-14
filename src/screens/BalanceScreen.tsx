@@ -1,11 +1,10 @@
 import { useCallback, useState } from "react";
-import { Alert, Modal, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context"
 import { Balance, Transaction } from "../types";
 import { useFocusEffect } from "@react-navigation/native";
 import { StorageService } from "../storage/storage";
 import { generateId, todayString } from "../utils/tradeUtils";
-import { TextInput } from "react-native-gesture-handler";
 
 export const BalanceScreen = () => {
 
@@ -117,8 +116,7 @@ export const BalanceScreen = () => {
     }
 
     const isPositive = (type:Transaction['type']) => {
-        type === 'deposit' || type === 'trade_profit'
-        return type
+        return type === 'deposit' || type === 'trade_profit'
     } 
 
     return (
@@ -258,7 +256,7 @@ export const BalanceScreen = () => {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: '#1d1d29' },
   content: { paddingHorizontal: 16 },
-  title: { fontSize: 26, fontWeight: '700', color: '#FFFFFF', paddingTop: 18, paddingBottom: 16 },
+  title: { paddingHorizontal: 16,fontSize: 26, fontWeight: '700', color: '#FFFFFF', paddingTop: 18, paddingBottom: 16 },
   setupBox: { backgroundColor: '#1A1A24', borderRadius: 16, padding: 32, alignItems: 'center', marginTop: 20, borderWidth: 1, borderColor: '#2A2A38' },
   setupIcon: { fontSize: 48, marginBottom: 16 },
   setupTitle: { fontSize: 18, fontWeight: '700', color: '#FFFFFF', marginBottom: 8 },
@@ -290,14 +288,14 @@ const styles = StyleSheet.create({
   transactionNote: { fontSize: 12, color: '#555577', marginBottom: 2 },
   transactionDate: { fontSize: 11, color: '#3A3A50' },
   transactionAmount: { fontSize: 15, fontWeight: '700' },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'flex-end' },
-  modalBox: { backgroundColor: '#1A1A24', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 24, paddingBottom: Platform.OS === 'ios' ? 40 : 24, borderWidth: 1, borderColor: '#2A2A38' },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center' },
+  modalBox: { backgroundColor: '#1A1A24', borderTopLeftRadius: 24, borderTopRightRadius: 24,borderBottomRightRadius:24, borderBottomLeftRadius:24, padding: 24, paddingBottom: Platform.OS === 'ios' ? 40 : 24, borderWidth: 1, borderColor: '#2A2A38' },
   modalTitle: { fontSize: 20, fontWeight: '700', color: '#FFFFFF', marginBottom: 20 },
   fieldLabel: { fontSize: 12, fontWeight: '600', color: '#555577', marginBottom: 5, textTransform: 'uppercase' },
   input: { backgroundColor: '#13131C', borderRadius: 10, borderWidth: 1, borderColor: '#2A2A38', paddingHorizontal: 14, paddingVertical: Platform.OS === 'ios' ? 12 : 8, fontSize: 15, color: '#FFFFFF', marginBottom: 16 },
   modalBtns: { flexDirection: 'row', gap: 12 },
   cancelBtn: { flex: 1, backgroundColor: '#13131C', borderRadius: 12, paddingVertical: 14, alignItems: 'center' },
-  cancelBtnText: { fontSize: 15, fontWeight: '600', color: '#555577' },
+  cancelBtnText: { fontSize: 15, fontWeight: '600', color: '#FFFFFF' },
   confirmBtn: { flex: 1, backgroundColor: '#2979FF', borderRadius: 12, paddingVertical: 14, alignItems: 'center' },
   confirmBtnText: { fontSize: 15, fontWeight: '700', color: '#FFF' },
 });

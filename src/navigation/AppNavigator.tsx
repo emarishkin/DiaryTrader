@@ -10,6 +10,7 @@ import { StrategiesScreen  } from "../screens/StrategiesScreen";
 import { TradeDetailScreen } from "../screens/TradeDetailScreen";
 import { StrategyDetailScreen } from "../screens/StrategyDetailScreen";
 import { SettingsScreen } from "../screens/SettingsScreen";
+import { BalanceScreen } from "../screens/BalanceScreen";
 
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator()
@@ -53,6 +54,7 @@ const DashboardStack = () => {
             <Stack.Screen name="EditTrade" component={AddTradeScreen} />
             <Stack.Screen name="Strategies" component={StrategiesScreen} />
             <Stack.Screen name="StrategyDetail" component={StrategyDetailScreen} />
+            <Stack.Screen name="Balance" component={BalanceScreen} />
         </Stack.Navigator>
     )
 }
