@@ -184,6 +184,10 @@ export const BalanceScreen = () => {
                             </TouchableOpacity>
                         </View>
 
+                        <TouchableOpacity style={[styles.resetBtn,{marginBottom:30}]} onPress={()=>handleReset()} activeOpacity={0.85}>
+                            <Text style={styles.resetBtnText}>🔄 Сбросить баланс</Text>
+                        </TouchableOpacity>
+
                         <EquityCurve title="Кривая капитала" />
 
                         <Text style={styles.sectionTitle}>История движений</Text>
@@ -214,9 +218,6 @@ export const BalanceScreen = () => {
                     </>
                 )}
 
-                <TouchableOpacity style={styles.resetBtn} onPress={()=>handleReset()} activeOpacity={0.85}>
-                    <Text style={styles.resetBtnText}>🔄 Сбросить баланс</Text>
-                </TouchableOpacity>
  
                 <View style={{height:100}} />
             </ScrollView>
