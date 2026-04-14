@@ -6,6 +6,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { StorageService } from "../storage/storage";
 import { generateId, todayString } from "../utils/tradeUtils";
 import { EquityCurve } from "../components/EquityCurve";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const BalanceScreen = () => {
 
@@ -120,6 +121,27 @@ export const BalanceScreen = () => {
         return type === 'deposit' || type === 'trade_profit'
     } 
 
+    const handleReset = () => {
+        Alert.alert(
+            '⚠️ Сбросить баланс?',
+            'Начальный депозит и все транзакции будут удалены. Транзакции от сделок тоже удалятся',
+            [
+                {text:'Отмена',style:'cancel'},
+                {
+                    text:'Сбросить',
+                    style:'destructive',
+                    onPress:async()=>{
+                        await AsyncStorage.removeItem('@trader_diary:balance')
+                        await AsyncStorage.removeItem('@trader_diary:transactions')
+                        setBalance(null)
+                        setTransactions([])
+                        Alert.alert('✅ Готово', 'Баланс сброшен')
+                    }
+                }
+            ]
+        )
+    }
+
     return (
         <SafeAreaView style={styles.root}>
             <Text style={styles.title}>💼 Баланс счета</Text>
@@ -191,6 +213,10 @@ export const BalanceScreen = () => {
 
                     </>
                 )}
+
+                <TouchableOpacity style={styles.resetBtn} onPress={()=>handleReset()} activeOpacity={0.85}>
+                    <Text style={styles.resetBtnText}>🔄 Сбросить баланс</Text>
+                </TouchableOpacity>
  
                 <View style={{height:100}} />
             </ScrollView>
@@ -301,4 +327,18 @@ const styles = StyleSheet.create({
   cancelBtnText: { fontSize: 15, fontWeight: '600', color: '#FFFFFF' },
   confirmBtn: { flex: 1, backgroundColor: '#2979FF', borderRadius: 12, paddingVertical: 14, alignItems: 'center' },
   confirmBtnText: { fontSize: 15, fontWeight: '700', color: '#FFF' },
+  resetBtn: {
+    backgroundColor: '#13131C',
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#2A2A38',
+    marginTop: 8,
+  },
+  resetBtnText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#555577',
+  },
 });
