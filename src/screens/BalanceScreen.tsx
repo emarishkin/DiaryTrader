@@ -1,10 +1,11 @@
 import { useCallback, useState } from "react";
-import { Alert, Platform, ScrollView, StyleSheet, Text } from "react-native";
+import { Alert, Modal, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context"
 import { Balance, Transaction } from "../types";
 import { useFocusEffect } from "@react-navigation/native";
 import { StorageService } from "../storage/storage";
 import { generateId, todayString } from "../utils/tradeUtils";
+import { TextInput } from "react-native-gesture-handler";
 
 export const BalanceScreen = () => {
 
@@ -117,14 +118,139 @@ export const BalanceScreen = () => {
 
     const isPositive = (type:Transaction['type']) => {
         type === 'deposit' || type === 'trade_profit'
+        return type
     } 
 
     return (
         <SafeAreaView style={styles.root}>
             <Text style={styles.title}>💼 Баланс счета</Text>
             <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+                {!balance ? (
+                    <View style={styles.setupBox}>
+                        <Text style={styles.setupIcon}>💰</Text>
+                        <Text style={styles.setupTitle}>Настройте счёт</Text>
+                        <Text style={styles.setupHint}>Введите начальный размер депозита чтобы отслеживать кривую капитала</Text>
+                        <TouchableOpacity style={styles.setupBtn} onPress={()=>setModalType('setup')} activeOpacity={0.85}>
+                            <Text style={styles.setupBtnText}>+ Настроить депозит</Text>
+                        </TouchableOpacity>
+                    </View>
+                ):(
+                    <>
+                        <View style={styles.balanceCard}>
+                            <Text style={styles.balanceLabel}>Текущий баланс</Text>
+                            <Text style={styles.balanceValue}>{currentBalance.toLocaleString('ru-RU',{minimumFractionDigits:2})} {currencySymbol}</Text>
+                            <View style={styles.balanceRow}>
+                                <View style={styles.balanceStat}>
+                                    <Text style={styles.balanceStatLabel}>Начальный депозит</Text>
+                                    <Text style={styles.balanceStatValue}>
+                                        {balance.initialAmount.toLocaleString('ru-RU',{maximumFractionDigits:2})} {currencySymbol}
+                                    </Text>
+                                </View>
+                                <View style={styles.balanceStat}>
+                                    <Text style={styles.balanceStatLabel}>P&L от сделок</Text>
+                                    <Text style={[styles.balanceStatValue, tradePnl >= 0 ? styles.green : styles.red]}>
+                                        {tradePnl >= 0 ? '+' : '-'}{tradePnl.toLocaleString('ru-RU', {minimumFractionDigits:2})} {currencySymbol}
+                                    </Text>
+                                </View>
+                            </View>
+                        </View>
+                        <View style={styles.btnRow}>
+                            <TouchableOpacity style={styles.depositBtn} onPress={()=>setModalType('deposit')} activeOpacity={0.85}>
+                                <Text style={styles.depositBtnText}>+ Пополнить</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.withdrawBtn} onPress={()=>setModalType('withdrawal')} activeOpacity={0.85}>
+                                <Text style={styles.withdrawBtnText}>- Вывести</Text>
+                            </TouchableOpacity>
+                        </View>
 
+                        <Text style={styles.sectionTitle}>История движений</Text>
+                        {transactions.length === 0 ? (
+                            <View style={styles.emptyBox}>
+                                <Text style={styles.emptyText}>Нет транзакций</Text>
+                                <Text style={styles.emptyHint}>Пополните счёт или закройте сделку</Text>
+                            </View>
+                        ):(
+                            transactions.map(t => (
+                                <View style={styles.transactionRow} key={t.id}>
+                                    <View style={styles.transactionLeft}>
+                                        <Text style={styles.transactionIcon}>{getTransactionIcon(t.type)}</Text>
+                                        <View>
+                                            <Text style={styles.transactionLabel}>{getTransactionLabel(t.type)}</Text>
+                                            {t.note ? <Text style={styles.transactionNote}>{t.note}</Text> : null}
+                                            <Text style={styles.transactionDate}>{t.date}</Text>
+                                        </View>
+                                    </View>
+                                    <Text style={[styles.transactionAmount, isPositive(t.type) ? styles.green : styles.red]}>
+                                        {isPositive(t.type) ? '+' : '-'}
+                                        {t.amount.toLocaleString('ru-RU',{minimumFractionDigits:2})} {currencySymbol}
+                                    </Text>
+                                </View>
+                            ))
+                        )}
+
+                    </>
+                )}
+ 
+                <View style={{height:100}} />
             </ScrollView>
+
+            <Modal visible={modalType !== null} transparent animationType='slide'>
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalBox}>
+                        <Text style={styles.modalTitle}>
+                            { 
+                                modalType === 'setup' ? '💰 Начальный депозит' : 
+                                modalType === 'deposit' ? '+ Пополнение счёта' :
+                                '- Вывод средств'
+                            }
+                        </Text>
+
+                        <Text style={styles.fieldLabel}>Cумма *</Text>
+                        <TextInput 
+                            style={styles.input}
+                            value={amount}
+                            onChangeText={setAmount}
+                            placeholder="0.00"
+                            placeholderTextColor='#555577'
+                            keyboardType='decimal-pad'
+                        />
+
+                        {modalType !== 'setup' && (
+                            <>
+                                <Text style={styles.fieldLabel}>Примечание</Text>
+                                <TextInput 
+                                    style={styles.input}
+                                    value={note}
+                                    onChangeText={setNote}
+                                    placeholder="Необязательно..."
+                                    placeholderTextColor='#555577'
+                                />
+                            </>
+                        )}
+
+                        <View style={styles.modalBtns}>
+                            <TouchableOpacity style={styles.cancelBtn} onPress={()=>{setModalType(null); setAmount(''); setNote('')}}>
+                                <Text style={styles.cancelBtnText}>Отмена</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={styles.confirmBtn}
+                                onPress={
+                                    modalType === 'setup' ? handleSetupBalance : 
+                                    modalType === 'deposit' ? handleDeposit : handleWithdrawal
+                                }
+                            > 
+                                <Text style={styles.cancelBtnText}>
+                                    {
+                                        modalType === 'setup' ? 'Сохранить' :
+                                        modalType === 'deposit' ? 'Пополнить' : 'Вывести'
+                                    }
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+
         </SafeAreaView>
     )
 }
