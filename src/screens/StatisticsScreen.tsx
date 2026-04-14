@@ -5,6 +5,7 @@ import { Trade } from "../types";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { StorageService } from "../storage/storage";
 import { formatMoney } from "../utils/tradeUtils";
+import { EquityCurve } from "../components/EquityCurve";
 
 const StatisticsScreen = () => {
 
@@ -149,6 +150,8 @@ const StatisticsScreen = () => {
                                 </Text>
                             </View>
                         </View>
+
+                        <EquityCurve title="Кривая капитала" />
 
                         <View style={styles.section}>
                             <Text style={styles.sectionTitle}>🏆 Лучшая/ Худшая сделка</Text>

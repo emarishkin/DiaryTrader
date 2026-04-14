@@ -5,6 +5,7 @@ import { Balance, Transaction } from "../types";
 import { useFocusEffect } from "@react-navigation/native";
 import { StorageService } from "../storage/storage";
 import { generateId, todayString } from "../utils/tradeUtils";
+import { EquityCurve } from "../components/EquityCurve";
 
 export const BalanceScreen = () => {
 
@@ -160,6 +161,8 @@ export const BalanceScreen = () => {
                                 <Text style={styles.withdrawBtnText}>- Вывести</Text>
                             </TouchableOpacity>
                         </View>
+
+                        <EquityCurve title="Кривая капитала" />
 
                         <Text style={styles.sectionTitle}>История движений</Text>
                         {transactions.length === 0 ? (

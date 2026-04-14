@@ -69,18 +69,18 @@ const DashboardScreen = () => {
                 </View>
 
                 <View style={styles.statsRow}>
-                    <View style={styles.statCard}>
+                    <View style={[styles.statCard, { width:'26%' }]}>
                         <Text style={styles.statVal}>{openTrades.length}</Text>
                         <Text style={styles.statLabel}>Открытых</Text>
                     </View>
-                    <View style={styles.statCard}>
+                    <TouchableOpacity style={[styles.statCard, { width:'26%' }]} onPress={()=>navigation.navigate('TradeHistory')}>               
                         <Text style={styles.statVal}>{trades.length}</Text>
-                        <Text style={styles.statLabel}>Всего сделок</Text>
-                    </View>
-                    <View style={[styles.statCard, netPnL > 0 && styles.statGreen, netPnL < 0 && styles.statRed]}>
+                        <Text style={styles.statLabel}>Всего сделок</Text>                   
+                    </TouchableOpacity>
+                    <TouchableOpacity  style={[styles.statCard, netPnL > 0 && styles.statGreen, netPnL < 0 && styles.statRed, { width:'42%' }]} onPress={() => navigation.navigate('Balance')} activeOpacity={0.8}>
                         <Text style={[styles.statVal, netPnL > 0 && styles.green, netPnL < 0 && styles.red]}>{netPnL === 0 ? '0 USDT' : formatMoney(netPnL, closeTrades[0]?.currency)}</Text>
                         <Text style={styles.statLabel}>Чистый P&L</Text>
-                    </View>
+                    </TouchableOpacity>
                 </View>
 
                 <View style={styles.sectionHeader}>
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
   searchInput: { flex: 1, fontSize: 14, color: '#FFFFFF' },
   clearBtn: { fontSize: 13, color: '#555577', paddingLeft: 8 },
   statsRow: { flexDirection: 'row', gap: 10, marginBottom: 16 },
-  statCard: { flex: 1, backgroundColor: '#1A1A24', borderRadius: 14, paddingVertical: 14, paddingHorizontal: 8, alignItems: 'center', borderWidth: 1, borderColor: '#2A2A38' },
+  statCard: {backgroundColor: '#1A1A24', borderRadius: 14, paddingVertical: 14, paddingHorizontal: 8, alignItems: 'center', borderWidth: 1, borderColor: '#2A2A38' },
   statGreen: { backgroundColor: '#0D2E1A', borderColor: '#1B5E35' },
   statRed: { backgroundColor: '#2E0D0D', borderColor: '#5E1B1B' },
   statVal: { fontSize: 17, fontWeight: '700', color: '#FFFFFF', marginBottom: 3 },
